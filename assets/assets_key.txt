@@ -1,0 +1,86 @@
+:sheet_dim:
+[
+[9, 5]
+]
+
+:tile_dim:
+[
+[16, 24]
+]
+
+:colorkey:
+[
+[0, 0, 0]
+]
+
+:creature sets:
+[
+[player: 0: 0]
+[flame: 3: 0]
+[gnome: 3: 1]
+[gnome_zinger: 3: 2]
+[gnome_wiz: 3: 3]
+[gnome_thief: 3: 4]
+]
+
+:creature set tiles:
+[
+[a: 0: 0]
+[b: 0: 1]
+]
+
+:wall sets:
+[
+[dungeon: 1: 1]
+[cavern: 2: 1]
+]
+
+:wall set tiles:
+[
+[ver: 0: 0]
+[hor_a: 1: 0]
+[hor_b: 2: 0]
+]
+
+:enviro sets:
+[
+[main: 0: 1]
+]
+
+:enviro set tiles:
+[
+[crystal_large: 0: 0]
+[crystal_small: 1: 0]
+
+[brazier_off: 2: 0]
+[brazier_lit_ani_a: 3: 0]
+[brazier_lit_ani_b: 4: 0]
+
+[stone_1: 5: 0]
+[stone_2: 6: 0]
+[stone_3: 7: 0]
+
+[dungeon_ver_wall: 0: 1]
+[dungeon_hor_wall_1: 1: 1]
+[dungeon_hor_wall_2: 2: 1]
+
+[cavern_ver_wall: 0: 2]
+[cavern_hor_wall_1: 1: 2]
+[cavern_hor_wall_2: 2: 2]
+
+[door_closed: 3: 1]
+[door_opened: 3: 2]
+
+[tuft_1: 4: 1]
+[tuft_2: 5: 1]
+[tuft_3: 6: 1]
+[tuft_4: 7: 1]
+
+[grass_1: 4: 2]
+[grass_2: 5: 2]
+
+[stalagtite_1: 6: 2]
+[stalagtite_2: 7: 2]
+
+]
+
