@@ -25,5 +25,8 @@ class TerrainMap(_Map):
         
     def init(self):
         self.tile_map.init()
+        
+    def get_tile_id(self, point):
+        return TerrainMap.key[self.get_tile(point)]
     
         
