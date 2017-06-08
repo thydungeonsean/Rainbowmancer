@@ -1,0 +1,5 @@
+
+
+
+class MasterMap(object):
+    pass

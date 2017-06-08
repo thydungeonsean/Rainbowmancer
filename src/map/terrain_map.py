@@ -1,4 +1,6 @@
 from _map import _Map
+from tile_map import TileMap
+from master_color_map import MasterColorMap
 
 
 class TerrainMap(_Map):
@@ -16,5 +18,12 @@ class TerrainMap(_Map):
         
         _Map.__init__(self, w, h)
         
+        self.tile_map = TileMap(self)
+        self.color_map = MasterColorMap(self)
+        
+        self.init()
+        
+    def init(self):
+        self.tile_map.init()
     
         

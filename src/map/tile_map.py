@@ -1,4 +1,5 @@
 from _map import _Map
+from random import *
 
 
 class TileMap(_Map):
@@ -23,20 +24,28 @@ class TileMap(_Map):
     16: 'door_closed',
     17: 'door_opened',
     20: 'brazier_off',
-    21: 'brazier_lit_ani_a',
-    22: 'brazier_lit_ani_b',
+    21: 'brazier_lit_ani',
     30: 'crystal_large',
     32: 'crystal_small',
     34: 'stalagtite_1',
     35: 'stalagtite_2',
     }
     
-    def __init__(self, terrain_map, ani_frame='a'):
+    def __init__(self, terrain_map):
         
         w = terrain_map.w
         h = terrain_map.h
         _Map.__init__(self, w, h)
+        self.terrain_map = terrain_map
         
-        self.ani_frame = ani_frame
+    def point_is_animated(self, point):
+        return self.get_tile_key(point).endswith('ani')
         
+    def get_tile_key(self, point):
+        return TileMap.key[self.get_tile(point)]
+        
+    def init(self):
+        # translate terrain_map tile data into specific tile keys
+        
+    
     

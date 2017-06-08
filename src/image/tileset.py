@@ -5,6 +5,14 @@ import pygame
 
 class TileSet(object):
 
+    enviro = None
+
+    @classmethod
+    def get_enviro_tiles(cls):
+        if cls.enviro is None:
+            cls.enviro = cls('enviro', 'main')
+        return cls.enviro
+
     def __init__(self, set_type, set_id):
         
         self.sheet_key = 'assets_key'

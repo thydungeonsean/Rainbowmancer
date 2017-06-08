@@ -97,9 +97,13 @@ grey_shades = {
 1: GREY_1 
 }
 
-def get_shade(r, g, b):
+def get_shade(r, g, b, col_mod):  # TODO make col_mod effect
+    
+    if r == 0 and g == 0 and b == 0:
+        return grey_shades[1]
+    
     # primary
-    if r > 0 and g == 0 and b == 0:
+    elif r > 0 and g == 0 and b == 0:
         return red_shades[r]
     elif r == 0 and g > 0 and b == 0:
         return green_shades[g]
