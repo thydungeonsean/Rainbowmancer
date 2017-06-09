@@ -49,6 +49,9 @@
 
 :enviro set tiles:
 [
+
+[blank: -1: 2]
+
 [crystal_large: 0: 0]
 [crystal_small: 1: 0]
 

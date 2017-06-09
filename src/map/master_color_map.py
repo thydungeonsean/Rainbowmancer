@@ -10,7 +10,7 @@ class MasterColorMap(object):
         self.green_map = ColorMap(terrain_map, 'green')
         self.blue_map = ColorMap(terrain_map, 'blue')
         
-    def get_tile_color(self, col_mod, *xargs)
+    def get_tile_color(self, col_mod, *xargs):
             
         # if not in FOV, return grey shade - no col_mod
             
