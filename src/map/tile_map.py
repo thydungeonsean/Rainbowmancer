@@ -70,8 +70,14 @@ class TileMap(_Map):
             t = choice(range(1, 10))
         self.set_tile(t, point)
 
-    def set_wall_tile(self, point):
-        self.set_tile(TileMap.encode['cavern_ver_wall'], point)
+    def set_wall_tile(self, (px, py)):
+
+        if self.point_in_bounds((px, py+1)) and self.terrain_map.get_tile((px, py+1)) not in (1, 2):
+            tile_code = choice((14, 14, 15))
+        else:
+            tile_code = 13
+
+        self.set_tile(tile_code, (px, py))
 
     def set_door_tile(self, point):
         self.set_tile(TileMap.encode['door_closed'], point)
