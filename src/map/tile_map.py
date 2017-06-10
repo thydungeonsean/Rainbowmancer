@@ -62,6 +62,10 @@ class TileMap(_Map):
                 self.set_brazier_tile(point)
             elif tile_id == 'stalagtite':
                 self.set_stalagtite_tile(point)
+            elif tile_id == 'large_crystal':
+                self.set_large_crystal_tile(point)
+            elif tile_id == 'small_crystal':
+                self.set_small_crystal_tile(point)
 
     def set_floor_tile(self, point):
         if randint(0, 99) < 65:
@@ -87,5 +91,9 @@ class TileMap(_Map):
 
     def set_stalagtite_tile(self, point):
         self.set_tile(randint(34, 35), point)
-    
-    
+
+    def set_large_crystal_tile(self, point):
+        self.set_tile(TileMap.encode['crystal_large'], point)
+
+    def set_small_crystal_tile(self, point):
+        self.set_tile(TileMap.encode['crystal_small'], point)

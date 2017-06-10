@@ -34,6 +34,13 @@ class Color(object):
         self.g = new[1]
         self.b = new[2]
 
-
     def get(self):
         return self.r, self.g, self.b
+
+
+def add_colors((ar, ag, ab), (br, bg, bb)):
+
+    r = (ar + br) / 2
+    g = (ag + bg) / 2
+    b = (ab + bb) / 2
+    return r, g, b

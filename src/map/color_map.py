@@ -60,4 +60,4 @@ class ColorMap(_Map):
                     token = str(v)
                 line.append(token)
             print ''.join(line)
-    
+

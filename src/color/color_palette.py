@@ -1,125 +1,98 @@
+from color import add_colors
 
-RED_5 = (250, 10, 0)
-RED_4 = (215, 10, 0)
-RED_3 = (200, 10, 0)
-RED_2 = (170, 10, 0)
-RED_1 = (150, 10, 0)
 
-red_shades = {
-5: RED_5,
-4: RED_4,
-3: RED_3,
-2: RED_2,
-1: RED_1
-}
+def set_shade_scale(r=0, g=0, b=0, step=-45):
 
-GREEN_5 = (25, 250, 0)
-GREEN_4 = (25, 215, 0)
-GREEN_3 = (25, 200, 0)
-GREEN_2 = (25, 170, 0)
-GREEN_1 = (25, 150, 0)
+    shades = {}
 
-green_shades = {
-5: GREEN_5,
-4: GREEN_4,
-3: GREEN_3,
-2: GREEN_2,
-1: GREEN_1
-}
+    i = 5
+    for s in range(250, (250 + (step*5)), step):
 
-BLUE_5 = (25, 0, 250)
-BLUE_4 = (25, 0, 215)
-BLUE_3 = (25, 0, 200)
-BLUE_2 = (25, 0, 170)
-BLUE_1 = (25, 0, 150)
+        if r < 0:
+            sr = s
+        else:
+            sr = r
+        if g < 0:
+            sg = s
+        else:
+            sg = g
+        if b < 0:
+            sb = s
+        else:
+            sb = b
 
-blue_shades = {
-5: BLUE_5,
-4: BLUE_4,
-3: BLUE_3,
-2: BLUE_2,
-1: BLUE_1
-}
+        shades[i] = (sr, sg, sb)
 
-YELLOW_5 = (255, 240, 0)
-YELLOW_4 = (235, 222, 0)
-YELLOW_3 = (220, 210, 0)
-YELLOW_2 = (200, 190, 0)
-YELLOW_1 = (180, 170, 0)
+        i -= 1
 
-yellow_shades = {
-5: YELLOW_5,
-4: YELLOW_4,
-3: YELLOW_3,
-2: YELLOW_2,
-1: YELLOW_1
-}
+    return shades
 
-CYAN_5 = (0, 255, 240)
-CYAN_4 = (0, 235, 222)
-CYAN_3 = (0, 220, 210)
-CYAN_2 = (0, 200, 190)
-CYAN_1 = (0, 180, 170)
+red_shades = set_shade_scale(-1, 10)
 
-cyan_shades = {
-5: CYAN_5,
-4: CYAN_4,
-3: CYAN_3,
-2: CYAN_2,
-1: CYAN_1
-}
+green_shades = set_shade_scale(25, -1)
 
-PURPLE_5 = (240, 0, 255)
-PURPLE_4 = (222, 0, 235)
-PURPLE_3 = (210, 0, 220)
-PURPLE_2 = (190, 0, 200)
-PURPLE_1 = (170, 0, 180)
+blue_shades = set_shade_scale(20, 0, -1)
 
-purple_shades = {
-5: PURPLE_5,
-4: PURPLE_4,
-3: PURPLE_3,
-2: PURPLE_2,
-1: PURPLE_1
-}
+# yellow_shades = set_shade_scale(-1, -1, 20)
 
-GREY_5 = (255, 255, 255)
-GREY_4 = (215, 215, 215)
-GREY_3 = (190, 190, 190)
-GREY_2 = (150, 150, 150)
-GREY_1 = (90, 90, 90)
+# cyan_shades = set_shade_scale(0, -1, -1)
 
-grey_shades = {
-5: GREY_5, 
-4: GREY_4, 
-3: GREY_3, 
-2: GREY_2, 
-1: GREY_1 
-}
+# purple_shades = set_shade_scale(-1, 15, -1)
+
+grey_shades = set_shade_scale(-1, -1, -1)
+
+purple_shades = {}
+for i in range(1, 6):
+    purple_shades[i] = add_colors(red_shades[i], blue_shades[i])
+
+yellow_shades = {}
+for i in range(1, 6):
+    yellow_shades[i] = add_colors(red_shades[i], green_shades[i])
+
+cyan_shades = {}
+for i in range(1, 6):
+    cyan_shades[i] = add_colors(green_shades[i], blue_shades[i])
+
+
+def col_mod_shade(shade, col_mod):
+
+    mod_shade = shade + col_mod
+    if mod_shade > 5:
+        mod_shade = 5
+
+    return mod_shade
+
 
 def get_shade(r, g, b, col_mod):  # TODO make col_mod effect
-    
+
     if r == 0 and g == 0 and b == 0:
-        return grey_shades[1]
-    
+        shade = 1
+        hue = grey_shades
+        return hue[shade]
+
     # primary
     elif r > 0 and g == 0 and b == 0:
-        return red_shades[r]
+        shade = r
+        hue = red_shades
     elif r == 0 and g > 0 and b == 0:
-        return green_shades[g]
+        shade = g
+        hue = green_shades
     elif r == 0 and g == 0 and b > 0:
-        return blue_shades[b]
-        
+        shade = b
+        hue = blue_shades
+
     elif r > 0 and g > 0 and b == 0:
         shade = max((r, g))
-        return yellow_shades[shade]
+        hue = yellow_shades
     elif r == 0 and g > 0 and b > 0:
         shade = max((g, b))
-        return cyan_shades[shade]
+        hue = cyan_shades
     elif r > 0 and g == 0 and b > 0:
         shade = max((r, b))
-        return purple_shades[shade]
-        
+        hue = purple_shades
+
     else:
         shade = max((r, g, b))
-        return grey_shades[shade]
+        hue = grey_shades
+
+    return hue[col_mod_shade(shade, col_mod)]
