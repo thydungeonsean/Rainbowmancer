@@ -35,8 +35,8 @@ class Image(object):
         self.rect = None
         self.color = (255, 255, 255)
     
-    def position(self, pos):
-        self.rect.topleft = pos
+    def position(self, (x, y)):
+        self.rect.topleft = x * Image.TILEW, y * Image.TILEH
     
     def draw(self, surface):
         surface.blit(self.surf, self.rect)

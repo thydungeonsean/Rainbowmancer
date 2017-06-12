@@ -1,6 +1,6 @@
 :sheet_dim:
 [
-[9, 5]
+[11, 5]
 ]
 
 :tile_dim:
@@ -16,11 +16,18 @@
 :creature sets:
 [
 [player: 0: 0]
-[flame: 3: 0]
-[gnome: 3: 1]
-[gnome_zinger: 3: 2]
-[gnome_wiz: 3: 3]
-[gnome_thief: 3: 4]
+
+[gnome: 3: 0]
+[gnome_zinger: 3: 1]
+[gnome_wiz: 3: 2]
+[gnome_thief: 3: 3]
+
+[flame: 3: 3]
+[eye: 3: 4]
+
+[djin: 3: 5]
+
+
 ]
 
 :creature set tiles:
@@ -50,14 +57,14 @@
 :enviro set tiles:
 [
 
-[blank: -1: 2]
+[blank: 4: 0]
 
-[crystal_large: 0: 0]
-[crystal_small: 1: 0]
+[crystal_large: 8: 0]
+[crystal_small: 8: 1]
 
-[brazier_off: 2: 0]
-[brazier_lit_ani_a: 3: 0]
-[brazier_lit_ani_b: 4: 0]
+[brazier_off: 0: 0]
+[brazier_lit_ani_a: 1: 0]
+[brazier_lit_ani_b: 2: 0]
 
 [stone_1: 5: 0]
 [stone_2: 6: 0]
@@ -74,6 +81,8 @@
 [door_closed: 3: 1]
 [door_opened: 3: 2]
 
+[stairs_down: 3: 0]
+
 [tuft_1: 4: 1]
 [tuft_2: 5: 1]
 [tuft_3: 6: 1]
@@ -81,6 +90,8 @@
 
 [grass_1: 4: 2]
 [grass_2: 5: 2]
+
+[mushrooms: 8: 2]
 
 [stalagtite_1: 6: 2]
 [stalagtite_2: 7: 2]

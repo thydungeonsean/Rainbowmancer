@@ -39,7 +39,10 @@ blue_shades = set_shade_scale(20, 0, -1)
 
 # purple_shades = set_shade_scale(-1, 15, -1)
 
-grey_shades = set_shade_scale(-1, -1, -1)
+white_shades = set_shade_scale(-1, -1, -1)
+
+grey_shades = {}
+grey_shades[0] = (30, 30, 30)
 
 purple_shades = {}
 for i in range(1, 6):
@@ -66,7 +69,7 @@ def col_mod_shade(shade, col_mod):
 def get_shade(r, g, b, col_mod):  # TODO make col_mod effect
 
     if r == 0 and g == 0 and b == 0:
-        shade = 1
+        shade = 0
         hue = grey_shades
         return hue[shade]
 
@@ -93,6 +96,6 @@ def get_shade(r, g, b, col_mod):  # TODO make col_mod effect
 
     else:
         shade = max((r, g, b))
-        hue = grey_shades
+        hue = white_shades
 
     return hue[col_mod_shade(shade, col_mod)]

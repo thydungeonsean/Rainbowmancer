@@ -2,6 +2,12 @@ import pygame
 from pygame.locals import *
 from map.master_map import MasterMap
 from map.terrain_map import TerrainMap
+from src.map.color_source import ColorSource
+
+from map.mapgen import MapGen
+from src.state.game import Game
+from src.map_objects.player import Player
+from src.map_objects.light_component import LightComponent
 
     
 pygame.init()
@@ -26,22 +32,26 @@ def set_demo():
         ]
 
     m = MasterMap()
-    t = TerrainMap(10, 10)
-    t.set_map(map)
+    #t = TerrainMap(10, 10)
+    t = MapGen.generate_terrain_map_cave(40, 20, map_seed=None)
+
+    #t.set_map(map)
 
     m.set_terrain_map(t)
     m.initialize()
 
-    #m.color_map.add_source(0, (4, 4), 5)
-    #m.color_map.add_source(4, (8, 6), 4)
-    #m.color_map.add_source('cyan', (2, 2), 5)
-    #m.color_map.add_source(6, (1, 8), 5)
-    #m.color_map.add_source('blue', (1, 8), 5)
-    #m.color_map.add_source('yellow', (8, 1), 1)
-    m.color_map.add_source(0, (5, 5), 5)
-    m.color_map.add_source(1, (5, 6), 5)
-    m.color_map.add_source(2, (4, 5), 5)
-    m.map_image.redraw_all_maps()
+    m.color_source_generator.get_color_source((2, 10), 'white', 4)
+    m.color_source_generator.get_color_source((20, 16), 'yellow', 4)
+    m.color_source_generator.get_color_source((33, 4), 'blue', 4)
+    m.color_source_generator.get_color_source((15, 10), 'red', 4)
+    m.color_source_generator.get_color_source((30, 13), 'green', 5)
+    m.color_source_generator.get_color_source((25, 16), 'cyan', 3)
+    m.color_source_generator.get_color_source((3, 3), 'purple', 3)
+
+    m.color_map.recompute_maps()
+
+    m.map_image.add_batch_to_redraw(m.terrain_map.all_points)
+    m.map_image.redraw_tiles()
 
     return m
 
@@ -55,6 +65,7 @@ def get_m_id(tick):
         return 'a', 1
     else:
         return 'b', 1
+
 
 def draw(m, tick):
 
@@ -83,16 +94,26 @@ def main():
 
     clock = pygame.time.Clock()
 
-    while True:
+    p = 'player'
 
-        if handle_input():
-            break
+    g = Game(p)
+    g.load_level(m)
 
-        clock.tick(60)
+    m.map_object_generator.create_monster('gnome', (10, 10))
 
-        draw(m, tick)
-        pygame.display.update()
 
-        tick += 1
-        if tick >= 60:
-            tick = 0
+    g.main()
+
+    # while True:
+    #
+    #     if handle_input():
+    #         break
+    #
+    #     clock.tick(60)
+    #
+    #     draw(m, tick)
+    #     pygame.display.update()
+    #
+    #     tick += 1
+    #     if tick >= 60:
+    #         tick = 0

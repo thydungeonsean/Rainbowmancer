@@ -23,6 +23,7 @@ class TileMap(_Map):
         15: 'cavern_hor_wall_2',
         16: 'door_closed',
         17: 'door_opened',
+        18: 'stairs_down',
         20: 'brazier_off',
         21: 'brazier_lit_ani',
         30: 'crystal_large',
@@ -37,6 +38,7 @@ class TileMap(_Map):
         
         w = terrain_map.w
         h = terrain_map.h
+        self.map_seed = terrain_map.map_seed
         _Map.__init__(self, w, h)
         self.terrain_map = terrain_map
         
@@ -48,7 +50,7 @@ class TileMap(_Map):
         
     def initialize(self):
         # translate terrain_map tile data into specific tile keys
-
+        seed(self.map_seed)
         for point in self.all_points:
 
             tile_id = self.terrain_map.get_tile_id(point)
@@ -66,6 +68,8 @@ class TileMap(_Map):
                 self.set_large_crystal_tile(point)
             elif tile_id == 'small_crystal':
                 self.set_small_crystal_tile(point)
+            elif tile_id == 'stairs':
+                self.set_stairs_tile(point)
 
     def set_floor_tile(self, point):
         if randint(0, 99) < 65:
@@ -97,3 +101,6 @@ class TileMap(_Map):
 
     def set_small_crystal_tile(self, point):
         self.set_tile(TileMap.encode['crystal_small'], point)
+
+    def set_stairs_tile(self, point):
+        self.set_tile(TileMap.encode['stairs_down'], point)

@@ -4,10 +4,14 @@ class _Map(object):
 
     def __init__(self, w, h):
         
-        self.map = [[ 0 for my in range(w)] for mx in range(h)]
+        self.map = [[self.start_value() for my in range(h)] for mx in range(w)]
         self.w = w
         self.h = h
-    
+
+    @staticmethod
+    def start_value():
+        return 0
+
     @staticmethod
     def parse_xargs(*xargs):
         if isinstance(xargs[0], tuple):

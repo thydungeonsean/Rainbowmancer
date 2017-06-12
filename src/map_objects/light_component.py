@@ -1,4 +1,3 @@
-from src.map.light_source import LightSource
 
 
 class LightComponent(object):
@@ -7,9 +6,12 @@ class LightComponent(object):
 
         self.owner = owner
         self.map = map
-        self.coord = owner.coord
 
-        self.source = LightSource(self.coord, color, strength)
+        self.source = map.color_source_generator.get_color_source(self.coord, color, strength)
+
+    @property
+    def coord(self):
+        return self.owner.coord
 
     def move(self, new):
         self.source.move(new)
