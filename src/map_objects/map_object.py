@@ -1,4 +1,5 @@
 from image_component import ImageComponent
+from color_component import ColorComponent
 
 
 class MapObject(object):
@@ -9,6 +10,7 @@ class MapObject(object):
         self.coord = None
 
         self.image_component = None
+        self.color_component = None
 
         self.light_component = None
 
@@ -20,6 +22,9 @@ class MapObject(object):
 
     def set_image(self, name):
         self.image_component = ImageComponent(self, name)
+
+    def set_color(self, color):
+        self.color_component = ColorComponent(self, color)
 
     def set_light(self, light):
         self.light_component = light

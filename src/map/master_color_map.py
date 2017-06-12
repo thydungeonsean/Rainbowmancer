@@ -31,6 +31,14 @@ class MasterColorMap(object):
 
         return get_shade(r, g, b, col_mod)
 
+    def get_reflected_color(self, *xargs):
+
+        r = self.red_map.get_tile(*xargs)
+        g = self.green_map.get_tile(*xargs)
+        b = self.blue_map.get_tile(*xargs)
+
+        return get_shade(r, g, b, 1, reflected=True)
+
     def add_source(self, source):
 
         self.sources.append(source)

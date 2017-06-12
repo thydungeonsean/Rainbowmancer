@@ -20,7 +20,7 @@ class MapObjectGen(object):
     def add_player(self, player_key, coord):
 
         player = Player(coord, player_key)
-        #l = LightComponent(player, self.map, 'blue', 5)
+        #l = LightComponent(player, self.map, 'red', 5)
         #player.set_light(l)
 
         player.set_map(self.map)

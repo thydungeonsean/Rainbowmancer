@@ -80,4 +80,4 @@ class Game(object):
 
             self.clock.tick(Game.FPS)
             self.increment_tick()
-            print self.clock.get_fps()
+            # print self.clock.get_fps()

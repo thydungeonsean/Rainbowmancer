@@ -44,3 +44,11 @@ def add_colors((ar, ag, ab), (br, bg, bb)):
     g = (ag + bg) / 2
     b = (ab + bb) / 2
     return r, g, b
+
+
+def boost_color((r, g, b), boost):
+
+    r = min((r + boost, 255))
+    g = min((g + boost, 255))
+    b = min((b + boost, 255))
+    return r, g, b

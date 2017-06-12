@@ -16,6 +16,10 @@ class ImageComponent(object):
 
         frame = self.get_frame(tick)
         tile = self.tileset.get_tile_image(frame)
+
+        color = self.owner.color_component.get_color(tick)
+        tile.recolor(color)
+
         tile.position(self.coord)
         tile.draw(surface)
 

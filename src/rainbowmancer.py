@@ -40,13 +40,13 @@ def set_demo():
     m.set_terrain_map(t)
     m.initialize()
 
-    m.color_source_generator.get_color_source((2, 10), 'white', 4)
-    m.color_source_generator.get_color_source((20, 16), 'yellow', 4)
-    m.color_source_generator.get_color_source((33, 4), 'blue', 4)
-    m.color_source_generator.get_color_source((15, 10), 'red', 4)
+    m.color_source_generator.get_color_source((2, 10), 'white', 5)
+    m.color_source_generator.get_color_source((20, 16), 'yellow', 5)
+    m.color_source_generator.get_color_source((33, 4), 'blue', 5)
+    m.color_source_generator.get_color_source((15, 10), 'red', 5)
     m.color_source_generator.get_color_source((30, 13), 'green', 5)
-    m.color_source_generator.get_color_source((25, 16), 'cyan', 3)
-    m.color_source_generator.get_color_source((3, 3), 'purple', 3)
+    m.color_source_generator.get_color_source((25, 16), 'cyan', 5)
+    m.color_source_generator.get_color_source((3, 3), 'purple', 5)
 
     m.color_map.recompute_maps()
 
