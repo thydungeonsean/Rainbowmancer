@@ -52,3 +52,11 @@ def boost_color((r, g, b), boost):
     g = min((g + boost, 255))
     b = min((b + boost, 255))
     return r, g, b
+
+
+def drain_color((r, g, b), drain):
+
+    r = max((r - drain, 10))
+    g = max((g - drain, 10))
+    b = max((b - drain, 10))
+    return r, g, b

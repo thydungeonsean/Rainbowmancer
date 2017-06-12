@@ -1,5 +1,5 @@
 from src.map.color_map import ColorMap
-from src.color.color_palette import get_shade
+from src.color.color_palette import get_shade, get_hue
 
 
 class MasterColorMap(object):
@@ -38,6 +38,14 @@ class MasterColorMap(object):
         b = self.blue_map.get_tile(*xargs)
 
         return get_shade(r, g, b, 1, reflected=True)
+
+    def get_tile_hue(self, *xargs):
+
+        r = self.red_map.get_tile(*xargs)
+        g = self.green_map.get_tile(*xargs)
+        b = self.blue_map.get_tile(*xargs)
+
+        return get_hue(r, g, b)
 
     def add_source(self, source):
 

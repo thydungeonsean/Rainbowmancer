@@ -1,4 +1,4 @@
-from color import add_colors, boost_color
+from color import add_colors, boost_color, drain_color
 
 
 def set_shade_scale(r=0, g=0, b=0, step=-45):
@@ -33,14 +33,7 @@ green_shades = set_shade_scale(25, -1)
 
 blue_shades = set_shade_scale(20, 0, -1)
 
-# yellow_shades = set_shade_scale(-1, -1, 20)
-
-# cyan_shades = set_shade_scale(0, -1, -1)
-
-# purple_shades = set_shade_scale(-1, 15, -1)
-
 white_shades = set_shade_scale(-1, -1, -1)
-
 white_shades[0] = (30, 30, 30)
 
 purple_shades = {}
@@ -58,6 +51,29 @@ for i in range(1, 6):
     cyan_shades[i] = add_colors(green_shades[i], blue_shades[i])
     cyan_shades[i] = boost_color(cyan_shades[i], 50)
 
+
+hue_key = {
+    0: white_shades,
+    1: red_shades,
+    2: green_shades,
+    3: blue_shades,
+    4: yellow_shades,
+    5: purple_shades,
+    6: cyan_shades
+}
+
+
+hue_enmities = {
+    0: {},
+    1: {3, 6},
+    2: {1, 5},
+    3: {2, 4},
+    4: {5},
+    5: {6},
+    6: {4}
+}
+
+
 def col_mod_shade(shade, col_mod):
 
     mod_shade = shade + col_mod
@@ -67,7 +83,7 @@ def col_mod_shade(shade, col_mod):
     return mod_shade
 
 
-def get_shade(r, g, b, col_mod, reflected=False):  # TODO make col_mod effect
+def get_shade(r, g, b, col_mod, reflected=False):
 
     if r == 0 and g == 0 and b == 0:
         if reflected:
@@ -103,3 +119,35 @@ def get_shade(r, g, b, col_mod, reflected=False):  # TODO make col_mod effect
         hue = white_shades
 
     return hue[col_mod_shade(shade, col_mod)]
+
+
+def get_hue(r, g, b):
+    if r == 0 and g == 0 and b == 0:
+        return 0
+    # primary
+    elif r > 0 and g == 0 and b == 0:
+        return 1
+    elif r == 0 and g > 0 and b == 0:
+        return 2
+    elif r == 0 and g == 0 and b > 0:
+        return 3
+    # secondary
+    elif r > 0 and g > 0 and b == 0:
+        return 4
+    elif r > 0 and g == 0 and b > 0:
+        return 5
+    elif r == 0 and g > 0 and b > 0:
+        return 6
+    # white
+    else:
+        return 0
+
+
+def hue_interaction(object_hue, tile_hue):
+
+    if object_hue == tile_hue and object_hue != 0:
+        return 'positive'
+    elif tile_hue in hue_enmities[object_hue]:
+        return 'negative'
+    else:
+        return None
