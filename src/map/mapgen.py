@@ -154,6 +154,29 @@ class MapGen(object):
     @classmethod
     def clean_cave_map(cls, cave_map, w, h):
 
-        # remove diagonal only connections
+        for y in range(h-1):
+            for x in range(w-1):
+                cls.clean_square(cave_map, x, y)
 
         return cave_map
+
+    @classmethod
+    def clean_square(cls, cave_map, x, y):
+        square_value = []
+        square_coord = {}
+        i = 0
+        for sx in range(x, x+2):
+            for sy in range(y, y+2):
+                square_value.append(cave_map[x][y])
+                square_coord[i] = (sx, sy)
+                i += 1
+
+        if square_value[0] == square_value[2] or square_value[1] == square_value[3]:  # doesn't need cleaning
+            return
+
+        if not square_value[0]:
+            clear_x, clear_y = square_coord[choice((0, 3))]
+        else:
+            clear_x, clear_y = square_value[choice((1, 2))]
+
+        cave_map[clear_x][clear_y] = True

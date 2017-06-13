@@ -33,20 +33,20 @@ def set_demo():
 
     m = MasterMap()
     #t = TerrainMap(10, 10)
-    t = MapGen.generate_terrain_map_cave(40, 20, map_seed=None)
+    t = MapGen.generate_terrain_map_cave(45, 25, map_seed=None)
 
     #t.set_map(map)
 
     m.set_terrain_map(t)
     m.initialize()
 
-    m.color_source_generator.get_color_source((2, 10), 'white', 5)
-    m.color_source_generator.get_color_source((20, 16), 'yellow', 5)
-    m.color_source_generator.get_color_source((33, 4), 'blue', 5)
-    m.color_source_generator.get_color_source((15, 10), 'red', 5)
-    m.color_source_generator.get_color_source((30, 13), 'green', 5)
-    m.color_source_generator.get_color_source((25, 16), 'cyan', 5)
-    m.color_source_generator.get_color_source((3, 3), 'purple', 5)
+    # m.color_source_generator.get_color_source((2, 10), 'white', 5)
+    # m.color_source_generator.get_color_source((20, 16), 'yellow', 5)
+    # m.color_source_generator.get_color_source((33, 4), 'blue', 5)
+    # m.color_source_generator.get_color_source((15, 10), 'red', 5)
+    # m.color_source_generator.get_color_source((30, 13), 'green', 5)
+    # m.color_source_generator.get_color_source((25, 16), 'cyan', 5)
+    # m.color_source_generator.get_color_source((3, 3), 'purple', 5)
 
     m.color_map.recompute_maps()
 

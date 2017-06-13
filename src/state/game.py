@@ -17,6 +17,8 @@ class Game(object):
         self.clock = pygame.time.Clock()
         self.tick = 0
 
+        self.sub_screen = pygame.Surface((400*2, 300*2))
+
         self.turn = 'player'
 
     def load_level(self, level):
@@ -33,11 +35,16 @@ class Game(object):
     def draw(self):
 
         screen = pygame.display.get_surface()
+        sw = self.sub_screen.get_width()
+        sh = self.sub_screen.get_height()
 
-        self.level.map_image.draw(screen, self.tick)
+        self.level.map_image.draw(self.sub_screen, self.tick)
 
         for object in self.objects:
-            object.draw(screen, self.tick)
+            object.draw(self.sub_screen, self.tick)
+
+        # pygame.transform.scale(self.sub_screen, (sw*2, sh*2), screen)
+        screen.blit(self.sub_screen, self.sub_screen.get_rect())
 
     def handle_input(self):
 
