@@ -88,6 +88,8 @@ class MapGen(object):
     START_BIRTH = 45
     NUMBER_PASSES = 2
 
+    ZONE_SIZE_THRESHOLD = 5
+
     @classmethod
     def generate_terrain_map_cave(cls, w, h, map_seed=None):
         if map_seed is None:
@@ -104,15 +106,11 @@ class MapGen(object):
 
         cave_map = cls.clean_cave_map(cave_map, cw, ch)
 
-        t = TerrainMap(w, h, map_seed)
-        for px, py in t.all_points:
-            try:
-                if cave_map[px][py]:
-                    t.set_tile(0, (px+1, py+1))
-            except IndexError:
-                pass
+        terrain_map = cls.create_terrain_map(cave_map, w, h, map_seed)
 
-        return t
+        z = cls.get_cave_zones(terrain_map)
+
+        return terrain_map
 
     @classmethod
     def run_cellular_automata(cls, old_cave_map, w, h):
@@ -180,3 +178,96 @@ class MapGen(object):
             clear_x, clear_y = square_value[choice((1, 2))]
 
         cave_map[clear_x][clear_y] = True
+
+    @classmethod
+    def create_terrain_map(cls, cave_map, w, h, map_seed):
+
+        t = TerrainMap(w, h, map_seed)
+        for px, py in t.all_points:
+            try:
+                if cave_map[px][py]:
+                    t.set_tile(0, (px + 1, py + 1))
+            except IndexError:
+                pass
+        return t
+
+    @classmethod
+    def get_floor_set(cls, t_map):
+
+        return filter(lambda x: t_map.get_tile(x) == 0, t_map.all_points)
+
+    @classmethod
+    def get_cave_zones(cls, t_map):
+
+        floor = list(cls.get_floor_set(t_map))
+
+        touched = set()
+        edge = []
+        point_zones = {}
+        zone_lists = {}
+
+        zone_id = 0
+
+        for point in floor:
+            if point not in touched:
+                edge.append(point)
+                while edge:
+                    for p in edge:
+                        touched.add(p)
+                        point_zones[p] = zone_id
+                        try:
+                            zone_lists[zone_id].append(p)
+                        except KeyError:
+                            zone_lists[zone_id] = [p]
+                    next_edge = cls.get_next_edge(edge, t_map)
+                    edge = list(filter(lambda x: t_map.get_tile(x) == 0 and x not in touched, next_edge))
+                zone_id += 1
+
+        cls.clean_zones(t_map, point_zones, zone_lists)
+
+        print point_zones
+        print zone_lists
+
+        for y in range(t_map.h):
+            line = []
+            for x in range(t_map.w):
+                a = point_zones.get((x, y))
+                if a is not None:
+                    line.append(str(a))
+                else:
+                    line.append(' ')
+            print ''.join(line)
+
+        cls.clean_zones(t_map, point_zones, zone_lists)
+        # connect zones
+
+        return point_zones, zone_lists
+
+    @classmethod
+    def get_next_edge(cls, edge, t_map):
+        next = set()
+        for point in edge:
+            adj = t_map.get_adj(point)
+            for a in adj:
+                next.add(a)
+        return list(next)
+
+    @classmethod
+    def clean_zones(cls, t_map, point_zones, zone_lists):
+
+        zone_sizes = [(k, len(v)) for (k, v) in zone_lists.iteritems()]
+
+        too_small = []
+
+        for z, size in zone_sizes:
+            if size < MapGen.ZONE_SIZE_THRESHOLD:
+                too_small.append(z)
+
+        for zone in too_small:
+            for point in zone_lists[zone]:
+                t_map.set_tile(1, point)
+                del point_zones[point]
+            del zone_lists[zone]
+
+
+
