@@ -110,6 +110,9 @@ class MapGen(object):
 
         z = cls.get_cave_zones(terrain_map)
 
+        cls.set_exit(terrain_map)
+        cls.set_entrance(terrain_map)
+
         return terrain_map
 
     @classmethod
@@ -193,8 +196,33 @@ class MapGen(object):
 
     @classmethod
     def get_floor_set(cls, t_map):
-
         return filter(lambda x: t_map.get_tile(x) == 0, t_map.all_points)
+
+    @classmethod
+    def get_wall_set(cls, t_map):
+        return filter(lambda x: t_map.get_tile(x) == 1, t_map.all_points)
+
+    @classmethod
+    def get_wall_edge_set(cls, t_map):
+        walls = cls.get_wall_set(t_map)
+        return filter(lambda w: cls.wall_is_edge(t_map, w), walls)
+
+    @classmethod
+    def get_hor_wall_set(cls, t_map):
+        return filter(lambda w: cls.wall_is_horizontal(t_map, w), cls.get_wall_edge_set(t_map))
+
+    @classmethod
+    def wall_is_edge(cls, t_map, point):
+        adj = t_map.get_adj(point)
+        for a in adj:
+            if t_map.get_tile(a) != 1:
+                return True
+        return False
+
+    @classmethod
+    def wall_is_horizontal(cls, t_map, (x, y)):
+        below = x, y+1
+        return t_map.point_in_bounds(below) and t_map.get_tile(below) != 1
 
     @classmethod
     def get_cave_zones(cls, t_map):
@@ -225,18 +253,15 @@ class MapGen(object):
 
         cls.clean_zones(t_map, point_zones, zone_lists)
 
-        print point_zones
-        print zone_lists
-
-        for y in range(t_map.h):
-            line = []
-            for x in range(t_map.w):
-                a = point_zones.get((x, y))
-                if a is not None:
-                    line.append(str(a))
-                else:
-                    line.append(' ')
-            print ''.join(line)
+        # for y in range(t_map.h):
+        #     line = []
+        #     for x in range(t_map.w):
+        #         a = point_zones.get((x, y))
+        #         if a is not None:
+        #             line.append(str(a))
+        #         else:
+        #             line.append(' ')
+        #     print ''.join(line)
 
         cls.clean_zones(t_map, point_zones, zone_lists)
         # connect zones
@@ -269,5 +294,52 @@ class MapGen(object):
                 del point_zones[point]
             del zone_lists[zone]
 
+    @classmethod
+    def set_exit(cls, t_map):
 
+        valid_exits = filter(lambda e: cls.valid_exit(t_map, e), cls.get_hor_wall_set(t_map))
 
+        if not valid_exits:
+            raise Exception('no valid exit on this map, need to create one')
+            # create exit space
+        else:
+            exit = choice(valid_exits)
+            t_map.set_exit(exit)
+
+    @classmethod
+    def valid_exit(cls, t_map, (x, y)):
+
+        left = x-1, y
+        right = x+1, y
+
+        return t_map.get_tile(left) == 1 and t_map.get_tile(right) == 1 and cls.wall_is_horizontal(t_map, left) and \
+            cls.wall_is_horizontal(t_map, right)
+
+    @classmethod
+    def set_entrance(cls, t_map):
+
+        ex = t_map.exit
+
+        d_map = {}
+
+        edge = [ex]
+        touched = set()
+        value = 0
+
+        while edge:
+            for point in edge:
+                touched.add(point)
+                if d_map.get(point) is None:
+                    d_map[point] = value
+                elif value < d_map.get(point):
+                    d_map[point] = value
+
+            next_edge = cls.get_next_edge(edge, t_map)
+            edge = list(filter(lambda x: t_map.get_tile(x) == 0 and x not in touched, next_edge))
+
+            value += 1
+
+        entrance_dist = max(d_map.values()) - randint(3, 5)
+        valid_entrances = filter(lambda (k, v): v == entrance_dist, d_map.iteritems())
+        entrance = choice(valid_entrances)[0]
+        t_map.set_entrance(entrance)

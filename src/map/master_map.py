@@ -32,6 +32,7 @@ class MasterMap(object):
 
     def set_terrain_map(self, terrain_map):
         self.terrain_map = terrain_map
+        self.player_start = self.terrain_map.entrance
 
     def initialize(self):
 

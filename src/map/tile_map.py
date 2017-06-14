@@ -58,6 +58,8 @@ class TileMap(_Map):
                 self.set_floor_tile(point)
             elif tile_id == 'wall':
                 self.set_wall_tile(point)
+            elif tile_id == 'stone_wall':
+                self.set_wall_tile(point, stone=True)
             elif tile_id == 'door':
                 self.set_door_tile(point)
             elif tile_id == 'brazier':
@@ -78,10 +80,14 @@ class TileMap(_Map):
             t = choice(range(1, 10))
         self.set_tile(t, point)
 
-    def set_wall_tile(self, (px, py)):
+    def set_wall_tile(self, (px, py), stone=False):
 
-        if self.point_in_bounds((px, py+1)) and self.terrain_map.get_tile((px, py+1)) not in (1, 2):
-            tile_code = choice((14, 14, 15))
+        if self.point_in_bounds((px, py+1)) and self.terrain_map.get_tile((px, py+1)) not in (1, 2, 7):
+            if stone:
+                codes = (11, 11, 12)
+            else:
+                codes = (14, 14, 15)
+            tile_code = choice(codes)
         else:
             tile_code = 13
 
