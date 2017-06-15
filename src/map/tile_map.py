@@ -82,7 +82,7 @@ class TileMap(_Map):
 
     def set_wall_tile(self, (px, py), stone=False):
 
-        if self.point_in_bounds((px, py+1)) and self.terrain_map.get_tile((px, py+1)) not in (1, 2, 7):
+        if self.point_in_bounds((px, py+1)) and self.terrain_map.get_tile((px, py+1)) not in (1, 2, 3, 7):
             if stone:
                 codes = (11, 11, 12)
             else:

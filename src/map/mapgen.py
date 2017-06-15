@@ -85,10 +85,12 @@ class MapGen(object):
 
     DEATH_LIMIT = 4
     BIRTH_LIMIT = 3
-    START_BIRTH = 45
+    START_BIRTH = 40
     NUMBER_PASSES = 2
 
     ZONE_SIZE_THRESHOLD = 5
+    SECRET_CAVE_CHANCE = 80
+    SECRET_CAVE_THRESHOLD = 12
 
     @classmethod
     def generate_terrain_map_cave(cls, w, h, map_seed=None):
@@ -108,7 +110,9 @@ class MapGen(object):
 
         terrain_map = cls.create_terrain_map(cave_map, w, h, map_seed)
 
-        z = cls.get_cave_zones(terrain_map)
+        point_zone, zone_lists = cls.get_cave_zones(terrain_map)
+
+        cls.clear_stranded_doors(terrain_map)
 
         cls.set_exit(terrain_map)
         cls.set_entrance(terrain_map)
@@ -155,8 +159,8 @@ class MapGen(object):
     @classmethod
     def clean_cave_map(cls, cave_map, w, h):
 
-        for y in range(h-1):
-            for x in range(w-1):
+        for y in range(0, h-1, 2):
+            for x in range(0, w-1, 2):
                 cls.clean_square(cave_map, x, y)
 
         return cave_map
@@ -172,7 +176,7 @@ class MapGen(object):
                 square_coord[i] = (sx, sy)
                 i += 1
 
-        if square_value[0] == square_value[2] or square_value[1] == square_value[3]:  # doesn't need cleaning
+        if square_value[0] == square_value[1] or square_value[2] == square_value[3]:  # doesn't need cleaning
             return
 
         if not square_value[0]:
@@ -222,10 +226,10 @@ class MapGen(object):
     @classmethod
     def wall_is_horizontal(cls, t_map, (x, y)):
         below = x, y+1
-        return t_map.point_in_bounds(below) and t_map.get_tile(below) != 1
+        return t_map.point_in_bounds(below) and t_map.get_tile(below) not in (1, 2, 3)
 
     @classmethod
-    def get_cave_zones(cls, t_map):
+    def flood_zones(cls, t_map):
 
         floor = list(cls.get_floor_set(t_map))
 
@@ -248,22 +252,31 @@ class MapGen(object):
                         except KeyError:
                             zone_lists[zone_id] = [p]
                     next_edge = cls.get_next_edge(edge, t_map)
-                    edge = list(filter(lambda x: t_map.get_tile(x) == 0 and x not in touched, next_edge))
+                    edge = list(filter(lambda x: t_map.get_tile(x) in (0, 3) and x not in touched, next_edge))
                 zone_id += 1
 
-        cls.clean_zones(t_map, point_zones, zone_lists)
+        return point_zones, zone_lists
 
-        # for y in range(t_map.h):
-        #     line = []
-        #     for x in range(t_map.w):
-        #         a = point_zones.get((x, y))
-        #         if a is not None:
-        #             line.append(str(a))
-        #         else:
-        #             line.append(' ')
-        #     print ''.join(line)
+    @classmethod
+    def get_cave_zones(cls, t_map):
+
+        point_zones, zone_lists = cls.flood_zones(t_map)
 
         cls.clean_zones(t_map, point_zones, zone_lists)
+
+        if len(zone_lists.keys()) > 1:
+            cls.connect_zones(t_map, point_zones, zone_lists)
+
+        for y in range(t_map.h):
+            line = []
+            for x in range(t_map.w):
+                a = point_zones.get((x, y))
+                if a is not None:
+                    line.append(str(a))
+                else:
+                    line.append(' ')
+            print ''.join(line)
+
         # connect zones
 
         return point_zones, zone_lists
@@ -295,6 +308,120 @@ class MapGen(object):
             del zone_lists[zone]
 
     @classmethod
+    def connect_zones(cls, t_map, point_zones, zone_lists):
+
+        zone_order = sorted(zone_lists.keys(), key=lambda z: len(zone_lists[z]))
+        largest = zone_order.pop()  # remove largest zone, don't need to connect it.
+
+        secret_zones = []
+
+        for zone_id in zone_order:
+
+            zone_connectors = cls.get_zone_connectors(t_map, point_zones, zone_id)
+            if len(zone_connectors) == 0:
+                cls.dig_tunnel(t_map, point_zones, zone_lists, zone_id, largest)
+            else:  # we either carve out a random connector to join zones or we leave it as a secret zone
+                if len(zone_lists[zone_id]) < MapGen.SECRET_CAVE_THRESHOLD \
+                        and randint(1, 100) <= MapGen.SECRET_CAVE_CHANCE:
+                    secret_zones.append(zone_id)
+                else:
+                    opening = choice(zone_connectors)
+                    if cls.valid_for_door(t_map, opening):
+                        tile = 3
+                    else:
+                        tile = 0
+                    t_map.set_tile(tile, opening)
+
+        # remove anything unconnected
+        # new_point_zones, new_zone_lists = cls.flood_zones(t_map)
+        # largest = sorted(new_zone_lists.keys(), key=lambda z: len(new_zone_lists[z])).pop()
+        # for point in cls.get_floor_set(t_map):
+        #     if new_point_zones.get(point) != largest:  # not connected
+        #         if point_zones.get(point) not in secret_zones:  # not secret
+        #             t_map.set_tile(1, point)
+
+    @classmethod
+    def valid_for_door(cls, t_map, (x, y)):
+        adj = ((x-1, y), (x+1, y), (x, y-1), (x, y+1))
+        zone = [t_map.get_tile(a) for a in adj]
+        return zone[0] == zone[1] and zone[2] == zone[3] and zone[0] != zone[2]
+
+    @classmethod
+    def get_zone_connectors(cls, t_map, point_zones, zone_id):
+
+        return filter(lambda z: cls.wall_is_zone_connector(z, t_map, point_zones, zone_id),
+                      cls.get_wall_edge_set(t_map))
+
+    @classmethod
+    def wall_is_zone_connector(cls, point, t_map, point_zones, zone_id):
+
+        adj = t_map.get_adj(point)
+        next_to_current_zone = False
+        adj_zones = set()
+        for a in adj:
+            if point_zones.get(a) == zone_id:
+                next_to_current_zone = True
+            if point_zones.get(a) is not None:
+                adj_zones.add(point_zones[a])
+        return next_to_current_zone and len(adj_zones) > 1
+
+    @classmethod
+    def dig_tunnel(cls, t_map, point_zones, zone_lists, zone_id, max):
+
+        start = choice(zone_lists[zone_id])
+
+        d_map = {}
+
+        edge = [start]
+        touched = set()
+        value = 0
+
+        tunnel_end = None
+        end = False
+
+        while edge:
+            for point in edge:
+                touched.add(point)
+
+                if d_map.get(point) is None:
+                    d_map[point] = value
+                elif value < d_map.get(point):
+                    d_map[point] = value
+
+                if point_zones.get(point) is not None and point_zones.get(point) == max:
+                    tunnel_end = point
+                    end = True
+            if end:
+                break
+            next_edge = cls.get_next_edge(edge, t_map)
+            edge = list(filter(lambda x: x not in touched, next_edge))
+
+            value += 1
+
+        if tunnel_end is None:
+            raise Exception('digging tunnel failed -- this should be impossible')
+
+        tunnel = [tunnel_end]
+        point = tunnel_end
+        while d_map.get(point) != 0:
+
+            adj = filter(lambda a: d_map.get(a) is not None, t_map.get_adj(point))
+            shuffle(adj)
+
+            adj = sorted(adj, key=lambda a: d_map.get(a))
+            point = adj[0]
+            tunnel.append(point)
+
+        for point in tunnel:
+            t_map.set_tile(0, point)
+
+        shuffle(tunnel)
+        for point in tunnel:
+            if cls.valid_for_door(t_map, point):
+                t_map.set_tile(3, point)
+                break
+
+    @classmethod
     def set_exit(cls, t_map):
 
         valid_exits = filter(lambda e: cls.valid_exit(t_map, e), cls.get_hor_wall_set(t_map))
@@ -311,9 +438,10 @@ class MapGen(object):
 
         left = x-1, y
         right = x+1, y
-
+        up = x, y-1
+        # TODO can't be in secret room??? or if in secret room, add another exit in main dungeon?
         return t_map.get_tile(left) == 1 and t_map.get_tile(right) == 1 and cls.wall_is_horizontal(t_map, left) and \
-            cls.wall_is_horizontal(t_map, right)
+            cls.wall_is_horizontal(t_map, right) and t_map.get_tile(up) == 1
 
     @classmethod
     def set_entrance(cls, t_map):
@@ -335,7 +463,7 @@ class MapGen(object):
                     d_map[point] = value
 
             next_edge = cls.get_next_edge(edge, t_map)
-            edge = list(filter(lambda x: t_map.get_tile(x) == 0 and x not in touched, next_edge))
+            edge = list(filter(lambda x: t_map.get_tile(x) in (0, 3) and x not in touched, next_edge))
 
             value += 1
 
@@ -343,3 +471,12 @@ class MapGen(object):
         valid_entrances = filter(lambda (k, v): v == entrance_dist, d_map.iteritems())
         entrance = choice(valid_entrances)[0]
         t_map.set_entrance(entrance)
+
+    @classmethod
+    def clear_stranded_doors(cls, t_map):
+
+        doors = filter(lambda d: t_map.get_tile(d) == 3, t_map.all_points)
+        for door in doors:
+            if not cls.valid_for_door(t_map, door):
+                t_map.set_tile(0, door)
+
