@@ -22,6 +22,8 @@ class TerrainMap(_Map):
         self.exit = None
         self.entrance = None
 
+        self.secret = set()
+
     @staticmethod
     def start_value():
         return 1

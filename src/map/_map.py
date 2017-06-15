@@ -43,8 +43,10 @@ class _Map(object):
 
         return 0 <= x < self.w and 0 <= y < self.h
 
-    def get_adj(self, (x, y)):
+    def get_adj(self, (x, y), diag=False):
 
-        adj = ((x+1, y), (x-1, y), (x, y+1), (x, y-1))
+        adj = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
+        if diag:
+            adj.extend([(x+1, y+1), (x+1, y-1), (x-1, y+1), (x-1, y-1)])
         return list(filter(self.point_in_bounds, adj))
         

@@ -92,11 +92,16 @@ class MapGen(object):
     SECRET_CAVE_CHANCE = 80
     SECRET_CAVE_THRESHOLD = 12
 
+    STALAGTITE = .03
+    BRAZIER = .01
+
     @classmethod
     def generate_terrain_map_cave(cls, w, h, map_seed=None):
         if map_seed is None:
             map_seed = randint(0, 9999)
         seed(map_seed)
+
+        print map_seed
 
         cw = w - 2
         ch = h - 2
@@ -116,6 +121,10 @@ class MapGen(object):
 
         cls.set_exit(terrain_map)
         cls.set_entrance(terrain_map)
+        cls.set_crystals(terrain_map, 10)
+
+        cls.set_braziers(terrain_map)
+        cls.set_stalagtites(terrain_map)
 
         return terrain_map
 
@@ -159,8 +168,8 @@ class MapGen(object):
     @classmethod
     def clean_cave_map(cls, cave_map, w, h):
 
-        for y in range(0, h-1, 2):
-            for x in range(0, w-1, 2):
+        for y in range(0, h, 2):
+            for x in range(0, w, 2):
                 cls.clean_square(cave_map, x, y)
 
         return cave_map
@@ -219,7 +228,7 @@ class MapGen(object):
     def wall_is_edge(cls, t_map, point):
         adj = t_map.get_adj(point)
         for a in adj:
-            if t_map.get_tile(a) != 1:
+            if t_map.get_tile(a) not in (1, 2):
                 return True
         return False
 
@@ -331,6 +340,10 @@ class MapGen(object):
                     else:
                         tile = 0
                     t_map.set_tile(tile, opening)
+
+        for z in secret_zones:
+            for point in zone_lists[z]:
+                t_map.secret.add(point)
 
         # remove anything unconnected
         # new_point_zones, new_zone_lists = cls.flood_zones(t_map)
@@ -467,8 +480,14 @@ class MapGen(object):
 
             value += 1
 
-        entrance_dist = max(d_map.values()) - randint(3, 5)
+        max_dist = max(d_map.values())
+        if max_dist > 6:
+            entrance_dist = max_dist - randint(3, 5)
+        else:
+            entrance_dist = max_dist
+
         valid_entrances = filter(lambda (k, v): v == entrance_dist, d_map.iteritems())
+        assert valid_entrances
         entrance = choice(valid_entrances)[0]
         t_map.set_entrance(entrance)
 
@@ -479,4 +498,138 @@ class MapGen(object):
         for door in doors:
             if not cls.valid_for_door(t_map, door):
                 t_map.set_tile(0, door)
+
+    @classmethod
+    def set_crystals(cls, t_map, num):
+
+        d_map = cls.get_edge_dist_dijkstra(t_map)
+        entrance_d_map = cls.get_entrance_dijkstra(t_map)
+
+        crystal_map = []
+
+        for i in range(num):
+            cls.set_crystal(t_map, d_map, entrance_d_map, crystal_map)
+
+    @classmethod
+    def set_crystal(cls, t_map, d_map, entrance_d_map, crystal_map):
+
+        optimal_distance = randint(2, 4)
+
+        floor = cls.get_floor_set(t_map)
+
+        weight_map = {}
+
+        for point in floor:
+            weight_map[point] = -1 * abs(optimal_distance - d_map[point]) + 5
+
+            if entrance_d_map.get(point) is not None and entrance_d_map[point] < 10:
+                weight_map[point] -= 10
+
+            if point in t_map.secret:
+                weight_map[point] += 5
+
+            x, y = point
+            for cx, cy in crystal_map:
+                if abs(x - cx) + abs(y - cy) < 10:
+                    weight_map[point] -= 5
+
+        crystal = sorted(weight_map.keys(), key = lambda x: weight_map[x]).pop()
+        t_map.set_tile(5, crystal)
+        crystal_map.append(crystal)
+
+    @classmethod
+    def get_edge_dist_dijkstra(cls, t_map):
+
+        d_map = {}
+
+        edge = list(cls.get_wall_edge_set(t_map))
+        touched = set()
+        value = 0
+
+        while edge:
+            for point in edge:
+                touched.add(point)
+                if d_map.get(point) is None:
+                    d_map[point] = value
+                elif value < d_map.get(point):
+                    d_map[point] = value
+
+            next_edge = cls.get_next_edge(edge, t_map)
+            edge = list(filter(lambda x: t_map.get_tile(x) in (0, 3) and x not in touched, next_edge))
+
+            value += 1
+
+        return d_map
+
+    @classmethod
+    def get_entrance_dijkstra(cls, t_map):
+
+        d_map = {}
+
+        edge = [t_map.entrance]
+        touched = set()
+        value = 0
+
+        while edge:
+            for point in edge:
+                touched.add(point)
+                if d_map.get(point) is None:
+                    d_map[point] = value
+                elif value < d_map.get(point):
+                    d_map[point] = value
+
+            next_edge = cls.get_next_edge(edge, t_map)
+            edge = list(filter(lambda x: t_map.get_tile(x) in (0, 3) and x not in touched, next_edge))
+
+            value += 1
+
+        return d_map
+
+    @classmethod
+    def set_stalagtites(cls, t_map):
+
+        floor = cls.get_floor_set(t_map)
+        shuffle(floor)
+
+        number = int(len(floor) * MapGen.STALAGTITE)
+        placed = 0
+
+        for point in floor:
+
+            if cls.point_not_obstructing(t_map, point):
+                t_map.set_tile(4, point)
+                placed += 1
+
+            if placed >= number:
+                break
+
+    @classmethod
+    def point_not_obstructing(cls, t_map, point):
+
+        adj = t_map.get_adj(point, diag=True)
+        for a in adj:
+            if t_map.get_tile(a) != 0:
+                return False
+        return True
+
+    @classmethod
+    def set_braziers(cls, t_map):
+
+        floor = cls.get_floor_set(t_map)
+        shuffle(floor)
+
+        number = int(len(floor) * MapGen.BRAZIER)
+        placed = 0
+
+        for point in floor:
+
+            if cls.point_not_obstructing(t_map, point):
+                t_map.set_tile(8, point)
+                placed += 1
+
+            if placed >= number:
+                break
+
+
+
 

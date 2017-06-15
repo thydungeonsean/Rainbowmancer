@@ -6,6 +6,9 @@ assets/assets.png
 # project files
 .idea/
 
+# log files
+*.log
+
 ### boiler plate python below
 
 # Byte-compiled / optimized / DLL files
