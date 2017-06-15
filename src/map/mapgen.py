@@ -95,8 +95,18 @@ class MapGen(object):
     STALAGTITE = .03
     BRAZIER = .01
 
+    MAPFAILED = False
+
     @classmethod
-    def generate_terrain_map_cave(cls, w, h, map_seed=None):
+    def mark_map_failed(cls):
+        cls.MAPFAILED = True
+
+    @classmethod
+    def reset(cls):
+        cls.MAPFAILED = False
+
+    @classmethod
+    def generate_terrain_map_cave(cls, w, h, map_seed=2180):
         if map_seed is None:
             map_seed = randint(0, 9999)
         seed(map_seed)
@@ -106,25 +116,35 @@ class MapGen(object):
         cw = w - 2
         ch = h - 2
 
-        cave_map = [[randint(1, 100) <= cls.START_BIRTH for my in range(ch)] for mx in range(cw)]
+        generating = True
 
-        for i in range(cls.NUMBER_PASSES):
-            cave_map = cls.run_cellular_automata(cave_map, cw, ch)
+        while generating:
 
-        cave_map = cls.clean_cave_map(cave_map, cw, ch)
+            cave_map = [[randint(1, 100) <= cls.START_BIRTH for my in range(ch)] for mx in range(cw)]
 
-        terrain_map = cls.create_terrain_map(cave_map, w, h, map_seed)
+            for i in range(cls.NUMBER_PASSES):
+                cave_map = cls.run_cellular_automata(cave_map, cw, ch)
 
-        point_zone, zone_lists = cls.get_cave_zones(terrain_map)
+            cave_map = cls.clean_cave_map(cave_map, cw, ch)
 
-        cls.clear_stranded_doors(terrain_map)
+            terrain_map = cls.create_terrain_map(cave_map, w, h, map_seed)
 
-        cls.set_exit(terrain_map)
-        cls.set_entrance(terrain_map)
-        cls.set_crystals(terrain_map, 10)
+            point_zone, zone_lists = cls.get_cave_zones(terrain_map)
 
-        cls.set_braziers(terrain_map)
-        cls.set_stalagtites(terrain_map)
+            cls.clear_stranded_doors(terrain_map)
+
+            cls.set_exit(terrain_map)
+            cls.set_entrance(terrain_map)
+            cls.set_crystals(terrain_map, 10)
+
+            cls.set_braziers(terrain_map)
+            cls.set_stalagtites(terrain_map)
+
+            # check that map is valid
+            # assert player and door are in interconnected zone
+
+            if not cls.MAPFAILED:
+                generating = False
 
         return terrain_map
 
@@ -334,6 +354,7 @@ class MapGen(object):
                         and randint(1, 100) <= MapGen.SECRET_CAVE_CHANCE:
                     secret_zones.append(zone_id)
                 else:
+
                     opening = choice(zone_connectors)
                     if cls.valid_for_door(t_map, opening):
                         tile = 3
@@ -344,6 +365,9 @@ class MapGen(object):
         for z in secret_zones:
             for point in zone_lists[z]:
                 t_map.secret.add(point)
+
+        for point in zone_lists[largest]:
+            t_map.main_zone.add(point)
 
         # remove anything unconnected
         # new_point_zones, new_zone_lists = cls.flood_zones(t_map)
@@ -426,7 +450,7 @@ class MapGen(object):
             tunnel.append(point)
 
         for point in tunnel:
-            t_map.set_tile(0, point)
+            t_map.set_tile(6, point)
 
         shuffle(tunnel)
         for point in tunnel:
@@ -451,34 +475,18 @@ class MapGen(object):
 
         left = x-1, y
         right = x+1, y
-        up = x, y-1
+        up = x, y - 1
+        down = x, y + 1
         # TODO can't be in secret room??? or if in secret room, add another exit in main dungeon?
         return t_map.get_tile(left) == 1 and t_map.get_tile(right) == 1 and cls.wall_is_horizontal(t_map, left) and \
-            cls.wall_is_horizontal(t_map, right) and t_map.get_tile(up) == 1
+            cls.wall_is_horizontal(t_map, right) and t_map.get_tile(up) == 1 and down in t_map.main_zone
 
     @classmethod
     def set_entrance(cls, t_map):
 
         ex = t_map.exit
 
-        d_map = {}
-
-        edge = [ex]
-        touched = set()
-        value = 0
-
-        while edge:
-            for point in edge:
-                touched.add(point)
-                if d_map.get(point) is None:
-                    d_map[point] = value
-                elif value < d_map.get(point):
-                    d_map[point] = value
-
-            next_edge = cls.get_next_edge(edge, t_map)
-            edge = list(filter(lambda x: t_map.get_tile(x) in (0, 3) and x not in touched, next_edge))
-
-            value += 1
+        d_map = cls.get_dijkstra(t_map, [ex])
 
         max_dist = max(d_map.values())
         if max_dist > 6:
@@ -528,6 +536,12 @@ class MapGen(object):
             if point in t_map.secret:
                 weight_map[point] += 5
 
+            # adj_walls = cls.count_adj_walls(t_map, point)  # weights in favour of points adj to walls
+            # if adj_walls == 2:
+            #     weight_map[point] += 1
+            # elif adj_walls == 3:
+            #     weight_map[point] += 2
+
             x, y = point
             for cx, cy in crystal_map:
                 if abs(x - cx) + abs(y - cy) < 10:
@@ -538,35 +552,29 @@ class MapGen(object):
         crystal_map.append(crystal)
 
     @classmethod
+    def count_adj_walls(cls, t_map, point):
+
+        count = 0
+        adj = t_map.get_adj(point)
+        for a in adj:
+            if t_map.get_tile(a) == 1:
+                count += 1
+        return count
+
+    @classmethod
     def get_edge_dist_dijkstra(cls, t_map):
 
-        d_map = {}
-
-        edge = list(cls.get_wall_edge_set(t_map))
-        touched = set()
-        value = 0
-
-        while edge:
-            for point in edge:
-                touched.add(point)
-                if d_map.get(point) is None:
-                    d_map[point] = value
-                elif value < d_map.get(point):
-                    d_map[point] = value
-
-            next_edge = cls.get_next_edge(edge, t_map)
-            edge = list(filter(lambda x: t_map.get_tile(x) in (0, 3) and x not in touched, next_edge))
-
-            value += 1
-
-        return d_map
+        return cls.get_dijkstra(t_map, list(cls.get_wall_edge_set(t_map)))
 
     @classmethod
     def get_entrance_dijkstra(cls, t_map):
 
+        return cls.get_dijkstra(t_map, [t_map.entrance])
+
+    @classmethod
+    def get_dijkstra(cls, t_map, edge):
         d_map = {}
 
-        edge = [t_map.entrance]
         touched = set()
         value = 0
 

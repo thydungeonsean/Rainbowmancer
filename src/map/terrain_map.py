@@ -23,6 +23,7 @@ class TerrainMap(_Map):
         self.entrance = None
 
         self.secret = set()
+        self.main_zone = set()
 
     @staticmethod
     def start_value():
