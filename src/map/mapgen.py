@@ -106,7 +106,7 @@ class MapGen(object):
         cls.MAPFAILED = False
 
     @classmethod
-    def generate_terrain_map_cave(cls, w, h, map_seed=2180):
+    def generate_terrain_map_cave(cls, w, h, map_seed=None):
         if map_seed is None:
             map_seed = randint(0, 9999)
         seed(map_seed)
@@ -117,8 +117,11 @@ class MapGen(object):
         ch = h - 2
 
         generating = True
+        c = 0
 
         while generating:
+
+            cls.reset()
 
             cave_map = [[randint(1, 100) <= cls.START_BIRTH for my in range(ch)] for mx in range(cw)]
 
@@ -129,22 +132,29 @@ class MapGen(object):
 
             terrain_map = cls.create_terrain_map(cave_map, w, h, map_seed)
 
-            point_zone, zone_lists = cls.get_cave_zones(terrain_map)
+            cls.get_cave_zones(terrain_map)
 
             cls.clear_stranded_doors(terrain_map)
 
-            cls.set_exit(terrain_map)
+            exit_placed = cls.set_exit(terrain_map)
+            if not exit_placed:
+                continue  # trash this map
+
             cls.set_entrance(terrain_map)
             cls.set_crystals(terrain_map, 10)
 
             cls.set_braziers(terrain_map)
             cls.set_stalagtites(terrain_map)
 
-            # check that map is valid
-            # assert player and door are in interconnected zone
+            if cls.check_map_connected(terrain_map):
+                print 'map success'
+            else:
+                cls.mark_map_failed()
 
             if not cls.MAPFAILED:
                 generating = False
+            print c
+            c += 1
 
         return terrain_map
 
@@ -296,19 +306,16 @@ class MapGen(object):
         if len(zone_lists.keys()) > 1:
             cls.connect_zones(t_map, point_zones, zone_lists)
 
-        for y in range(t_map.h):
-            line = []
-            for x in range(t_map.w):
-                a = point_zones.get((x, y))
-                if a is not None:
-                    line.append(str(a))
-                else:
-                    line.append(' ')
-            print ''.join(line)
-
-        # connect zones
-
-        return point_zones, zone_lists
+        # print zones
+        # for y in range(t_map.h):
+        #     line = []
+        #     for x in range(t_map.w):
+        #         a = point_zones.get((x, y))
+        #         if a is not None:
+        #             line.append(str(a))
+        #         else:
+        #             line.append(' ')
+        #     print ''.join(line)
 
     @classmethod
     def get_next_edge(cls, edge, t_map):
@@ -403,17 +410,13 @@ class MapGen(object):
         return next_to_current_zone and len(adj_zones) > 1
 
     @classmethod
-    def dig_tunnel(cls, t_map, point_zones, zone_lists, zone_id, max):
-
-        start = choice(zone_lists[zone_id])
+    def get_path(cls, t_map, edge, path_restriction, end_state):
 
         d_map = {}
-
-        edge = [start]
         touched = set()
         value = 0
 
-        tunnel_end = None
+        end_point = None
         end = False
 
         while edge:
@@ -425,21 +428,23 @@ class MapGen(object):
                 elif value < d_map.get(point):
                     d_map[point] = value
 
-                if point_zones.get(point) is not None and point_zones.get(point) == max:
-                    tunnel_end = point
+                if end_state(point):
+                    end_point = point
                     end = True
             if end:
                 break
             next_edge = cls.get_next_edge(edge, t_map)
-            edge = list(filter(lambda x: x not in touched, next_edge))
+            next_edge = filter(lambda x: x not in touched, next_edge)
+            edge = list(filter(path_restriction, next_edge))
 
             value += 1
 
-        if tunnel_end is None:
-            raise Exception('digging tunnel failed -- this should be impossible')
+        return d_map, end_point
 
-        tunnel = [tunnel_end]
-        point = tunnel_end
+    @classmethod
+    def trace_path(cls, t_map, d_map, end):
+        path = [end]
+        point = end
         while d_map.get(point) != 0:
 
             adj = filter(lambda a: d_map.get(a) is not None, t_map.get_adj(point))
@@ -447,10 +452,25 @@ class MapGen(object):
 
             adj = sorted(adj, key=lambda a: d_map.get(a))
             point = adj[0]
-            tunnel.append(point)
+            path.append(point)
+
+        return path
+
+    @classmethod
+    def dig_tunnel(cls, t_map, zones, zone_lists, zone_id, max):
+
+        start = choice(zone_lists[zone_id])
+
+        d_map, tunnel_end = cls.get_path(t_map, [start], lambda e: True,
+                                         lambda e: zones.get(e) is not None and zones[e] == max)
+
+        if tunnel_end is None:
+            raise Exception('digging tunnel failed -- this should be impossible')
+
+        tunnel = cls.trace_path(t_map, d_map, tunnel_end)
 
         for point in tunnel:
-            t_map.set_tile(6, point)
+            t_map.set_tile(0, point)
 
         shuffle(tunnel)
         for point in tunnel:
@@ -464,11 +484,46 @@ class MapGen(object):
         valid_exits = filter(lambda e: cls.valid_exit(t_map, e), cls.get_hor_wall_set(t_map))
 
         if not valid_exits:
-            raise Exception('no valid exit on this map, need to create one')
-            # create exit space
+            placed = cls.force_exit(t_map)
         else:
             exit = choice(valid_exits)
             t_map.set_exit(exit)
+            placed = True
+
+        return placed
+
+    @classmethod
+    def force_exit(cls, t_map):
+
+        force_exit_list = list(filter(lambda x: cls.valid_for_force_exit(t_map, x), t_map.main_zone))
+
+        if not force_exit_list:
+            return False
+
+        exit = choice(force_exit_list)
+        t_map.set_exit(exit)
+
+        ex, ey = exit
+        walls = ((ex-1, ey-1), (ex, ey-1), (ex+1, ey-1), (ex-1, ey), (ex+1, ey))
+
+        for point in walls:
+            t_map.set_tile(2, point)
+        return True
+
+    @classmethod
+    def valid_for_force_exit(cls, t_map, (x, y)):
+
+        force_zone = set()
+
+        for zx in range(x-2, x+4):
+            for zy in range(y-2, y+4):
+                force_zone.add((zx, zy))
+
+        for point in force_zone:
+            if not t_map.point_in_bounds(point) or t_map.get_tile(point) != 0:
+                return False
+
+        return True
 
     @classmethod
     def valid_exit(cls, t_map, (x, y)):
@@ -612,11 +667,11 @@ class MapGen(object):
                 break
 
     @classmethod
-    def point_not_obstructing(cls, t_map, point):
+    def point_not_obstructing(cls, t_map, point, safe=set()):
 
         adj = t_map.get_adj(point, diag=True)
         for a in adj:
-            if t_map.get_tile(a) != 0:
+            if t_map.get_tile(a) != 0 or a in safe:
                 return False
         return True
 
@@ -638,6 +693,16 @@ class MapGen(object):
             if placed >= number:
                 break
 
+    @classmethod
+    def check_map_connected(cls, t_map):
 
+        d_map, exit = cls.get_path(t_map, [t_map.entrance], lambda e: t_map.get_tile(e) in (0, 3, 5, 6, 7),
+                                   lambda x: x == t_map.exit)
 
+        # line = cls.trace_path(t_map, d_map, exit)
+        # line.pop(0)
+        # for point in line:
+        #     t_map.set_tile(4, point)
+
+        return exit is not None
 

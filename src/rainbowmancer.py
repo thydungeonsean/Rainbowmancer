@@ -33,7 +33,7 @@ def set_demo():
 
     m = MasterMap()
     #t = TerrainMap(10, 10)
-    t = MapGen.generate_terrain_map_cave(45, 25, map_seed=None)
+    t = MapGen.generate_terrain_map_cave(45, 25)
 
     #t.set_map(map)
 
