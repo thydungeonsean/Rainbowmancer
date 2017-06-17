@@ -7,7 +7,11 @@ class FOVMap(object):
     LIGHT_WALLS = True
     ALGO = 4
 
-    def __init__(self, level):
+    # turn of fov
+    def all_visible(self, point):
+        return self.explore_map.get(point) is not None
+
+    def __init__(self, level, pre_explored=False, fov_on=True):
 
         self.level = level
         self.player = None
@@ -22,6 +26,12 @@ class FOVMap(object):
         self.visible = set()
         self.explore_map = {}
 
+        self.pre_explored = pre_explored
+
+        if not fov_on:
+            self.pre_explored = True
+            self.point_is_visible = self.all_visible
+
     # init fov
     def init_fov_map(self):
 
@@ -30,6 +40,10 @@ class FOVMap(object):
         self.map = libtcod.map_new(self.w, self.h)
         for point in self.level.terrain_map.all_points:
             self.set_fov_map_point(point)
+
+        if self.pre_explored:
+            self.pre_explore_map()
+            self.level.redraw_manager.set_fov_redraw(self.explore_map.keys())
 
     def set_player(self, player):
         self.player = player
@@ -100,3 +114,29 @@ class FOVMap(object):
 
     def is_explored(self, point):
         return self.explore_map.get(point, False)
+
+    def pre_explore_map(self):
+
+        t_map = self.level.terrain_map
+        floor = list(filter(lambda x: t_map.get_tile(x) not in (1, 2), t_map.all_points))
+
+        touched = set()
+        edge = []
+
+        for point in floor:
+            if point not in touched:
+                edge.append(point)
+                while edge:
+                    for p in edge:
+                        touched.add(p)
+                    next_edge = self.get_next_edge(edge, t_map)
+                    edge = list(filter(lambda x: t_map.get_tile(x) not in (1, 2) and x not in touched, next_edge))
+
+    def get_next_edge(self, edge, t_map):
+        next = set()
+        for point in edge:
+            adj = t_map.get_adj(point, diag=True)
+            for a in adj:
+                next.add(a)
+                self.explore(a)
+        return list(next)

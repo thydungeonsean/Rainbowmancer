@@ -123,7 +123,7 @@ def get_shade(r, g, b, col_mod, reflected=False, seen=True):
             shade = max((r, g, b))
             hue = white_shades
     else:
-        shade = 1
+        shade = 0
         hue = white_shades
         return hue[shade]
 
