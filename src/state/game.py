@@ -1,6 +1,6 @@
-from src.map.mapgen import MapGen
 import pygame
 from pygame.locals import *
+from src.map.mapgen.master_map_gen import LevelGen
 
 
 class Game(object):
@@ -21,9 +21,9 @@ class Game(object):
 
         self.turn = 'player'
 
-    def load_level(self, level):
-        self.level = level
-        level.load_game(self)
+    def load_level(self):
+
+        self.level = LevelGen.generate_level(self)
 
         self.player = self.level.map_object_generator.add_player(self.player_key, self.level.player_start)
 

@@ -1,5 +1,5 @@
-from image_component import ImageComponent
-from color_component import ColorComponent
+from src.map_objects.components.image_component import ImageComponent
+from src.map_objects.components.color_component import ColorComponent
 
 
 class MapObject(object):
@@ -13,6 +13,9 @@ class MapObject(object):
         self.color_component = None
 
         self.light_component = None
+
+        self.blocks = True
+        self.block_sight = False
 
     def set_map(self, map):
         self.map = map

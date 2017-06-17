@@ -17,6 +17,8 @@
 [
 [player: 0: 0]
 
+[large_crystal: 0: 9]
+
 [gnome: 3: 0]
 [gnome_zinger: 3: 1]
 [gnome_wiz: 3: 2]
@@ -60,7 +62,7 @@
 [blank: 4: 0]
 
 [crystal_large: 8: 0]
-[crystal_small: 8: 1]
+[crystal_small: 9: 0]
 
 [brazier_off: 0: 0]
 [brazier_lit_ani_a: 1: 0]

@@ -6,11 +6,13 @@ from map_object_generator import MapObjectGen
 from redraw_manager import RedrawManager
 
 
-class MasterMap(object):
+class Level(object):
 
-    def __init__(self):
+    def __init__(self, game_state, map_seed=None):
 
-        self.game = None
+        self.map_seed = map_seed
+
+        self.game = game_state
 
         self.terrain_map = None
         self.tile_map = None
@@ -34,15 +36,8 @@ class MasterMap(object):
         self.terrain_map = terrain_map
         self.player_start = self.terrain_map.entrance
 
-    def initialize(self):
-
-        self.tile_map = TileMap(self.terrain_map)
-        self.tile_map.initialize()
-
-        self.color_map = MasterColorMap(self.terrain_map)
-        self.color_source_generator.set_color_map(self.color_map)
-
-        self.map_image = MapImage(self)
+    def set_map_image(self, map_image):
+        self.map_image = map_image
 
     @property
     def w(self):

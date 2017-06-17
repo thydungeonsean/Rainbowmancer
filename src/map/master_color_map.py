@@ -66,8 +66,8 @@ class MasterColorMap(object):
 
         needs_update = filter(lambda m: source.color in m.colors, (self.red_map, self.green_map, self.blue_map))
         # map(change_map, need_update)  # double check how that works
-        for m in needs_update:
-            m.change_map()
+        for map in needs_update:
+            map.change_map()
 
     def recompute_maps(self):
         difference = set()

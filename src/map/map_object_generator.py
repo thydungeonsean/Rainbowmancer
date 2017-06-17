@@ -1,7 +1,6 @@
 from src.map_objects.actor import Actor
 from src.map_objects.player import Player
-
-from src.map_objects.light_component import LightComponent
+from src.map_objects.crystal import Crystal
 
 
 class MapObjectGen(object):
@@ -20,10 +19,15 @@ class MapObjectGen(object):
     def add_player(self, player_key, coord):
 
         player = Player(coord, player_key)
-        l = LightComponent(player, self.map, 'cyan', 5)
-        player.set_light(l)
+        #l = LightComponent(player, self.map, 'cyan', 5)
+        #player.set_light(l)
 
         player.set_map(self.map)
         self.map.game.objects.insert(0, player)
 
         return player
+
+    def add_crystal(self, point, color):
+
+        c = Crystal(self.map, point, color)
+        self.add_map_object(c)

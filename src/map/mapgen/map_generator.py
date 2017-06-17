@@ -1,5 +1,5 @@
-from master_map import MasterMap
-from terrain_map import TerrainMap
+from src.map.master_map import Level
+from src.map.terrain_map import TerrainMap
 from random import *
 
 
@@ -20,7 +20,7 @@ class MapGen(object):
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]
 
-        m = MasterMap()
+        m = Level()
         t = TerrainMap(10, 10)
         t.set_map(map)
 
@@ -111,7 +111,7 @@ class MapGen(object):
             map_seed = randint(0, 9999)
         seed(map_seed)
 
-        print map_seed
+        # print map_seed
 
         cw = w - 2
         ch = h - 2
@@ -147,14 +147,12 @@ class MapGen(object):
             cls.set_stalagtites(terrain_map)
 
             if cls.check_map_connected(terrain_map):
-                print 'map success'
+                pass
             else:
                 cls.mark_map_failed()
 
             if not cls.MAPFAILED:
                 generating = False
-            print c
-            c += 1
 
         return terrain_map
 

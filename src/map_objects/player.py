@@ -12,7 +12,7 @@ class Player(Actor):
 
     def __init__(self, coord, player_key):
 
-        Actor.__init__(self, None, coord, player_key, color='cyan')
+        Actor.__init__(self, None, coord, player_key, color=None)
 
     def move_player(self, code):
 
