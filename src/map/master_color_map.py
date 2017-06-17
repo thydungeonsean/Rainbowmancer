@@ -15,7 +15,10 @@ class MasterColorMap(object):
 
     encode = {v: k for (k, v) in key.iteritems()}
 
-    def __init__(self, terrain_map):
+    def __init__(self, level):
+
+        self.level = level
+        terrain_map = self.level.terrain_map
 
         self.red_map = ColorMap(self, terrain_map, {'red', 'purple', 'yellow', 'white'})
         self.green_map = ColorMap(self, terrain_map, {'green', 'cyan', 'yellow', 'white'})
@@ -23,13 +26,15 @@ class MasterColorMap(object):
 
         self.sources = []
 
-    def get_tile_color(self, col_mod, *xargs):
+    def get_tile_color(self, col_mod, (x, y)):
 
-        r = self.red_map.get_tile(*xargs)
-        g = self.green_map.get_tile(*xargs)
-        b = self.blue_map.get_tile(*xargs)
+        r = self.red_map.get_tile((x, y))
+        g = self.green_map.get_tile((x, y))
+        b = self.blue_map.get_tile((x, y))
 
-        return get_shade(r, g, b, col_mod)
+        seen = self.level.fov_map.point_is_visible((x, y))
+
+        return get_shade(r, g, b, col_mod, seen=seen)
 
     def get_reflected_color(self, *xargs):
 
@@ -75,7 +80,9 @@ class MasterColorMap(object):
             if map.needs_recompute:
                 difference.update(map.compute_map())
 
-        return list(difference)
+        difference = filter(lambda x: self.level.fov_map.point_is_visible(x), list(difference))
+
+        return difference
 
     def needs_recompute(self):
 

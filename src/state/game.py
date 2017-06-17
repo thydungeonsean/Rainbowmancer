@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from src.map.mapgen.master_map_gen import LevelGen
+from src.map.mapgen.level_gen import LevelGen
 
 
 class Game(object):
@@ -26,6 +26,7 @@ class Game(object):
         self.level = LevelGen.generate_level(self)
 
         self.player = self.level.map_object_generator.add_player(self.player_key, self.level.player_start)
+        self.level.load_player(self.player)
 
     def increment_tick(self):
         self.tick += 1

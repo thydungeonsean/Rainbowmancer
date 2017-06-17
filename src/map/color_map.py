@@ -5,6 +5,7 @@ class ColorMap(_Map):
     def __init__(self, master, terrain_map, colors):
 
         self.master = master
+        self.fov_map = self.master.level.fov_map
 
         w = terrain_map.w
         h = terrain_map.h
@@ -38,7 +39,7 @@ class ColorMap(_Map):
                 if source.strength == i:
                     points.append(source.coord)
             for p in points:
-                if i > self.get_tile(p):  # and fov.is_visible(p)
+                if i > self.get_tile(p):
                     self.set_tile(i, p)
             points = self.get_next_edge(points)
 

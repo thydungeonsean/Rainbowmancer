@@ -16,3 +16,6 @@ class Crystal(MapObject):
     def get_light_component(self, color):
 
         return LightComponent(self, self.map, color, 5)
+
+    def on_bump(self):
+        self.remove()

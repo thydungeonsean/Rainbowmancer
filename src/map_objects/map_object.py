@@ -1,5 +1,4 @@
-from src.map_objects.components.image_component import ImageComponent
-from src.map_objects.components.color_component import ColorComponent
+from components.components import ImageComponent, ColorComponent
 
 
 class MapObject(object):
@@ -9,9 +8,9 @@ class MapObject(object):
         self.map = None
         self.coord = None
 
+        self.move_component = None
         self.image_component = None
         self.color_component = None
-
         self.light_component = None
 
         self.blocks = True
@@ -22,6 +21,9 @@ class MapObject(object):
 
     def set_coord(self, coord):
         self.coord = coord
+
+    def set_move(self, move):
+        self.move_component = move
 
     def set_image(self, name):
         self.image_component = ImageComponent(self, name)
@@ -39,6 +41,14 @@ class MapObject(object):
 
     def draw(self, surface, tick):
 
-        if self.image_component is not None:
+        if self.image_component is not None and self.map.fov_map.point_is_visible(self.coord):
 
             self.image_component.draw(surface, tick)
+
+    def remove(self):
+        self.map.game.objects.remove(self)
+        if self.light_component is not None:
+            self.light_component.kill()
+
+    def on_bump(self):
+        pass

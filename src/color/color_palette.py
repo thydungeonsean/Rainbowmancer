@@ -46,6 +46,8 @@ for i in range(1, 6):
     yellow_shades[i] = add_colors(red_shades[i], green_shades[i])
     yellow_shades[i] = boost_color(yellow_shades[i], 40)
 
+#print yellow_shades
+
 cyan_shades = {}
 for i in range(1, 6):
     cyan_shades[i] = add_colors(green_shades[i], blue_shades[i])
@@ -83,40 +85,47 @@ def col_mod_shade(shade, col_mod):
     return mod_shade
 
 
-def get_shade(r, g, b, col_mod, reflected=False):
+def get_shade(r, g, b, col_mod, reflected=False, seen=True):
 
     if r == 0 and g == 0 and b == 0:
         if reflected:
             shade = 4
+        elif seen:
+            shade = 1
         else:
             shade = 0
         hue = white_shades
         return hue[shade]
 
-    # primary
-    elif r > 0 and g == 0 and b == 0:
-        shade = r
-        hue = red_shades
-    elif r == 0 and g > 0 and b == 0:
-        shade = g
-        hue = green_shades
-    elif r == 0 and g == 0 and b > 0:
-        shade = b
-        hue = blue_shades
+    elif seen:
+        # primary
+        if r > 0 and g == 0 and b == 0:
+            shade = r
+            hue = red_shades
+        elif r == 0 and g > 0 and b == 0:
+            shade = g
+            hue = green_shades
+        elif r == 0 and g == 0 and b > 0:
+            shade = b
+            hue = blue_shades
 
-    elif r > 0 and g > 0 and b == 0:
-        shade = max((r, g))
-        hue = yellow_shades
-    elif r == 0 and g > 0 and b > 0:
-        shade = max((g, b))
-        hue = cyan_shades
-    elif r > 0 and g == 0 and b > 0:
-        shade = max((r, b))
-        hue = purple_shades
+        elif r > 0 and g > 0 and b == 0:
+            shade = max((r, g))
+            hue = yellow_shades
+        elif r == 0 and g > 0 and b > 0:
+            shade = max((g, b))
+            hue = cyan_shades
+        elif r > 0 and g == 0 and b > 0:
+            shade = max((r, b))
+            hue = purple_shades
 
+        else:
+            shade = max((r, g, b))
+            hue = white_shades
     else:
-        shade = max((r, g, b))
+        shade = 1
         hue = white_shades
+        return hue[shade]
 
     return hue[col_mod_shade(shade, col_mod)]
 

@@ -1,5 +1,5 @@
 from map_generator import MapGen
-from src.map.master_map import Level
+from src.map.level import Level
 from src.map.tile_map import TileMap
 from src.map.master_color_map import MasterColorMap
 from src.image.map_image import MapImage
@@ -22,6 +22,7 @@ class LevelGen(object):
         cls.initialize_level(level, terrain)
 
         cls.initialize_color_sources(level)
+        cls.create_door_objects(level)
 
         level.set_map_image(MapImage(level))
 
@@ -35,7 +36,7 @@ class LevelGen(object):
         level.tile_map = TileMap(level.terrain_map)
         level.tile_map.initialize()
 
-        level.color_map = MasterColorMap(level.terrain_map)
+        level.color_map = MasterColorMap(level)
         level.color_source_generator.set_color_map(level.color_map)
 
     @classmethod
@@ -47,3 +48,11 @@ class LevelGen(object):
             color = choice(('red', 'green', 'blue'))
             level.map_object_generator.add_crystal(point, color)
             #level.color_source_generator.get_color_source(point, color, 5)
+
+    @classmethod
+    def create_door_objects(cls, level):
+
+        doors = filter(lambda x: level.terrain_map.get_tile_id(x) == 'door', level.terrain_map.all_points)
+
+        for point in doors:
+            level.map_object_generator.add_door(point)

@@ -4,6 +4,7 @@ from src.image.map_image import MapImage
 from color_source import ColorSourceGen
 from map_object_generator import MapObjectGen
 from redraw_manager import RedrawManager
+from fov_map import FOVMap
 
 
 class Level(object):
@@ -18,7 +19,7 @@ class Level(object):
         self.tile_map = None
         self.color_map = None  # MasterColorMap(self.terrain_map)
 
-        self.fov_map = None
+        self.fov_map = FOVMap(self)
 
         self.map_image = None
 
@@ -31,6 +32,10 @@ class Level(object):
 
     def load_game(self, game):
         self.game = game
+
+    def load_player(self, player):
+        self.fov_map.set_player(player)
+        self.fov_map.recompute_fov()
 
     def set_terrain_map(self, terrain_map):
         self.terrain_map = terrain_map

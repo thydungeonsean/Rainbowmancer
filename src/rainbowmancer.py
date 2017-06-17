@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 
-from map.mapgen.master_map_gen import LevelGen
+from map.mapgen.level_gen import LevelGen
 from src.state.game import Game
 
 pygame.init()

@@ -1,6 +1,9 @@
 from src.map_objects.actor import Actor
 from src.map_objects.player import Player
 from src.map_objects.crystal import Crystal
+from src.map_objects.door import Door
+
+from src.map_objects.components.light_component import LightComponent
 
 
 class MapObjectGen(object):
@@ -22,8 +25,9 @@ class MapObjectGen(object):
         #l = LightComponent(player, self.map, 'cyan', 5)
         #player.set_light(l)
 
-        player.set_map(self.map)
+        player.initialize(self.map)
         self.map.game.objects.insert(0, player)
+        self.map.fov_map.init_fov_map()
 
         return player
 
@@ -31,3 +35,8 @@ class MapObjectGen(object):
 
         c = Crystal(self.map, point, color)
         self.add_map_object(c)
+
+    def add_door(self, point):
+
+        d = Door(self.map, point)
+        self.add_map_object(d)

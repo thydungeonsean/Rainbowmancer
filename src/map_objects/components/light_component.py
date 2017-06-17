@@ -15,3 +15,6 @@ class LightComponent(object):
 
     def move(self, new):
         self.source.move(new)
+
+    def kill(self):
+        self.source.kill()

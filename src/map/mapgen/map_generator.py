@@ -1,4 +1,4 @@
-from src.map.master_map import Level
+from src.map.level import Level
 from src.map.terrain_map import TerrainMap
 from random import *
 

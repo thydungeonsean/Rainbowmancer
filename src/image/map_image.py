@@ -3,12 +3,13 @@ from tileset import TileSet
 
 
 class MapImage(object):
+
     TILEW = 16
     TILEH = 24
 
-    def __init__(self, m_map):
+    def __init__(self, level):
 
-        self.map = m_map
+        self.level = level
 
         self.tileset = TileSet.get_enviro_tiles()
 
@@ -36,8 +37,8 @@ class MapImage(object):
 
     def init_map_images(self):
 
-        mw = self.map.w * MapImage.TILEW
-        mh = self.map.h * MapImage.TILEH
+        mw = self.level.w * MapImage.TILEW
+        mh = self.level.h * MapImage.TILEH
 
         self.images[('a', 0)] = pygame.Surface((mw, mh)).convert()
         self.images[('b', 0)] = pygame.Surface((mw, mh)).convert()
@@ -63,24 +64,26 @@ class MapImage(object):
 
     def draw_tile(self, surface, (px, py), (ani, col_mod)):
 
-        tl_map = self.map.tile_map
-        cls = MapImage
+        if self.level.fov_map.is_explored((px, py)):  # TODO is this good?
 
-        tile_key = tl_map.get_tile_key((px, py))
-        if tl_map.point_is_animated((px, py)):
-            tile_key = '_'.join((tile_key, ani))
+            tl_map = self.level.tile_map
+            cls = MapImage
 
-        color = self.map.color_map.get_tile_color(col_mod, (px, py))
+            tile_key = tl_map.get_tile_key((px, py))
+            if tl_map.point_is_animated((px, py)):
+                tile_key = '_'.join((tile_key, ani))
 
-        tile = self.tileset.get_tile_image(tile_key)
-        tile.recolor(color)
-        tile.position((px, py))
+            color = self.level.color_map.get_tile_color(col_mod, (px, py))
 
-        tile.draw(surface)
+            tile = self.tileset.get_tile_image(tile_key)
+            tile.recolor(color)
+            tile.position((px, py))
+
+            tile.draw(surface)
 
     def render_map(self, map_id):
 
-        points = self.map.terrain_map.all_points
+        points = self.level.terrain_map.all_points
         self.draw_tile_batch(self.images[map_id], points, map_id)
 
     def render_b_map(self, col_mod):
@@ -89,30 +92,32 @@ class MapImage(object):
         img.blit(self.images[('a', col_mod)], img.get_rect())  # copy a_map onto surface
 
         # get ani tiles and only update those
-        points = list(filter(self.map.tile_map.point_is_animated, self.map.tile_map.all_points))
+        points = list(filter(self.level.tile_map.point_is_animated, self.level.tile_map.all_points))
 
         self.draw_tile_batch(img, points, ('b', col_mod))
 
     def draw(self, surface, tick):
 
-        # or get map_id from other context
         map_id = self.get_map_id(tick)
         surface.blit(self.images[map_id], self.rect)
 
+    ###########################################
+    # redraw methods #
+    ##################
     def redraw_tile(self, point):
 
         cls = MapImage
         px, py = point
 
-        tile_key = self.map.tile_map.get_tile_key(point)
+        tile_key = self.level.tile_map.get_tile_key(point)
         animated = False
-        if self.map.tile_map.point_is_animated(point):
+        if self.level.tile_map.point_is_animated(point):
             a_key = '_'.join((tile_key, 'a'))
             b_key = '_'.join((tile_key, 'b'))
             animated = True
 
-        col_0 = self.map.color_map.get_tile_color(0, point)
-        col_1 = self.map.color_map.get_tile_color(1, point)
+        col_0 = self.level.color_map.get_tile_color(0, point)
+        col_1 = self.level.color_map.get_tile_color(1, point)
 
         if not animated:
             tile = self.tileset.get_tile_image(tile_key)
@@ -152,8 +157,8 @@ class MapImage(object):
         self.redraw_tile_list.append(point)
 
     def add_batch_to_redraw(self, points):
-        for point in points:
-            self.add_to_redraw(point)
+        self.set_redraw()
+        self.redraw_tile_list.extend(points)
 
     @staticmethod
     def get_map_id(tick):

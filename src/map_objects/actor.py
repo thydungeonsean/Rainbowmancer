@@ -1,4 +1,5 @@
 from map_object import MapObject
+from components.move_component import MoveComponent
 
 
 class Actor(MapObject):
@@ -11,3 +12,11 @@ class Actor(MapObject):
         self.set_coord(coord)
         self.set_image(name)
         self.set_color(color)
+        self.set_move(self.get_move_component(color))
+
+    def get_move_component(self, color):
+
+        return MoveComponent(self, self.map, color)
+
+    def bump(self, target):
+        target.on_bump()

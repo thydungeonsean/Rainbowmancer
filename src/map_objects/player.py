@@ -14,8 +14,14 @@ class Player(Actor):
 
         Actor.__init__(self, None, coord, player_key, color=None)
 
+    def initialize(self, level):
+        self.set_map(level)
+        self.move_component.map = level
+
     def move_player(self, code):
 
         mx, my = Player.move_code[code]
         new = self.coord[0]+mx, self.coord[1]+my
-        self.move(new)
+        if self.move_component.can_move(new):
+            self.move(new)
+            self.map.fov_map.recompute_fov()
