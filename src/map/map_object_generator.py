@@ -2,6 +2,7 @@ from src.map_objects.actor import Actor
 from src.map_objects.player import Player
 from src.map_objects.crystal import Crystal
 from src.map_objects.door import Door
+from src.map_objects.brazier import Brazier
 
 from src.map_objects.components.light_component import LightComponent
 
@@ -35,6 +36,10 @@ class MapObjectGen(object):
 
         c = Crystal(self.map, point, color)
         self.add_map_object(c)
+
+    def add_brazier(self, point):
+        b = Brazier(self.map, point)
+        self.add_map_object(b)
 
     def add_door(self, point):
 

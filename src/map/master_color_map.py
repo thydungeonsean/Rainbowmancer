@@ -1,5 +1,5 @@
 from src.map.color_map import ColorMap
-from src.color.color_palette import get_shade, get_hue
+from src.color.color_palette import get_shade, get_hue, hue_names
 
 
 class MasterColorMap(object):
@@ -26,31 +26,39 @@ class MasterColorMap(object):
 
         self.sources = []
 
-    def get_tile_color(self, col_mod, (x, y)):
+    def _get_tile_rgb(self, (x, y)):
 
         r = self.red_map.get_tile((x, y))
         g = self.green_map.get_tile((x, y))
         b = self.blue_map.get_tile((x, y))
 
+        return r, g, b
+
+    def get_tile_color(self, col_mod, (x, y)):
+
+        r, g, b = self._get_tile_rgb((x, y))
+
         seen = self.level.fov_map.point_is_visible((x, y))
 
         return get_shade(r, g, b, col_mod, seen=seen)
 
-    def get_reflected_color(self, *xargs):
+    def get_reflected_color(self, (x, y)):
 
-        r = self.red_map.get_tile(*xargs)
-        g = self.green_map.get_tile(*xargs)
-        b = self.blue_map.get_tile(*xargs)
+        r, g, b = self._get_tile_rgb((x, y))
 
         return get_shade(r, g, b, 1, reflected=True)
 
-    def get_tile_hue(self, *xargs):
+    def get_tile_hue(self, (x, y)):
 
-        r = self.red_map.get_tile(*xargs)
-        g = self.green_map.get_tile(*xargs)
-        b = self.blue_map.get_tile(*xargs)
+        r, g, b = self._get_tile_rgb((x, y))
 
         return get_hue(r, g, b)
+
+    def get_tile_hue_name(self, (x, y)):
+
+        hue = self.get_tile_hue((x, y))
+
+        return hue_names[hue]
 
     def add_source(self, source):
 

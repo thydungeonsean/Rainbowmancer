@@ -49,6 +49,11 @@ class LevelGen(object):
             level.map_object_generator.add_crystal(point, color)
             #level.color_source_generator.get_color_source(point, color, 5)
 
+        braziers = filter(lambda x: level.terrain_map.get_tile_id(x) == 'brazier', level.terrain_map.all_points)
+
+        for point in braziers:
+            level.map_object_generator.add_brazier(point)
+
     @classmethod
     def create_door_objects(cls, level):
 

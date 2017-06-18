@@ -54,6 +54,17 @@ for i in range(1, 6):
     cyan_shades[i] = boost_color(cyan_shades[i], 50)
 
 
+hue_names = {
+    0: 'white',
+    1: 'red',
+    2: 'green',
+    3: 'blue',
+    4: 'yellow',
+    5: 'purple',
+    6: 'cyan'
+}
+
+
 hue_key = {
     0: white_shades,
     1: red_shades,

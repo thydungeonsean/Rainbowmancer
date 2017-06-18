@@ -97,7 +97,7 @@ class TileMap(_Map):
         self.set_tile(TileMap.encode['door_closed'], point)
 
     def set_brazier_tile(self, point):
-        self.set_tile(TileMap.encode['brazier_lit_ani'], point)
+        self.set_tile(TileMap.encode['brazier_off'], point)
 
     def set_stalagtite_tile(self, point):
         self.set_tile(randint(34, 35), point)
