@@ -74,21 +74,25 @@ class FOVMap(object):
         self.recompute = True
 
     ###############################################
-    # main computing function - map_object is center of FOV
-    def recompute_fov(self):
+    # main computing function - center is coord of FOV source, if None, player is center
+    def recompute_fov(self, center=None):
+
         cls = FOVMap
         self.recompute = False
-        x, y = self.player.coord
+
+        if center is None:
+            x, y = self.player.coord
+        else:
+            x, y = center
+
         libtcod.map_compute_fov(self.map, x, y, cls.SIGHT_RADIUS, cls.LIGHT_WALLS, cls.ALGO)
 
-        new_visible = self.get_visible_points()
+        new_visible = self.get_visible_points((x, y))
         redraw = list(new_visible.symmetric_difference(self.visible))
         self.set_visible(new_visible)
         self.level.redraw_manager.set_fov_redraw(redraw)
 
-    def get_visible_points(self):
-
-        px, py = self.player.coord
+    def get_visible_points(self, (px, py)):
 
         visible = set()
 
@@ -97,7 +101,6 @@ class FOVMap(object):
                 if self.point_is_visible((x, y)):
                     visible.add((x, y))
                     self.explore((x, y))
-
         return visible
 
     def set_visible(self, new):

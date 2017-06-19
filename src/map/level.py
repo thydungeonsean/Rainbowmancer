@@ -1,25 +1,26 @@
-from src.map.master_color_map import MasterColorMap
-from src.map.tile_map import TileMap
-from src.image.map_image import MapImage
 from color_source import ColorSourceGen
 from map_object_generator import MapObjectGen
 from redraw_manager import RedrawManager
 from fov_map import FOVMap
+from path_finding_map import PathFindingMap
+from random import randint
 
 
 class Level(object):
 
-    def __init__(self, game_state, map_seed=None):
+    def __init__(self, floor, game_state, map_seed=None):
 
-        self.map_seed = map_seed
+        self.floor_number = floor
+
+        self.map_seed = self.set_map_seed(map_seed)
 
         self.game = game_state
 
         self.terrain_map = None
         self.tile_map = None
-        self.color_map = None  # MasterColorMap(self.terrain_map)
-
+        self.color_map = None
         self.fov_map = FOVMap(self)
+        self.path_finding_map = PathFindingMap(self)
 
         self.map_image = None
 
@@ -51,3 +52,11 @@ class Level(object):
     @property
     def h(self):
         return self.terrain_map.h
+
+    def set_map_seed(self, map_seed):
+
+        if map_seed is None:
+            map_seed = randint(1, 999999999)
+
+        map_seed = ''.join((str(map_seed), 'floor', str(self.floor_number)))
+        return map_seed

@@ -17,11 +17,9 @@ class Brazier(MapObject):
 
     def check_if_ignited(self):
 
-        # TODO wanted braziers that start in color zones to be ignited with that color, but this isn't working
-        # for some reason?  not big priority
-        # color = self.map.color_map.get_tile_hue_name(self.coord)
-        # print color
-        pass
+        color = self.map.color_map.get_tile_hue_name(self.coord)
+        if color != 'white':
+            self.light(color)
 
     def light(self, color):
         self.state = 1

@@ -12,6 +12,7 @@ class MapObject(object):
         self.image_component = None
         self.color_component = None
         self.light_component = None
+        self.ai_component = None
 
         self.blocks = True
         self.block_sight = False
@@ -33,6 +34,9 @@ class MapObject(object):
 
     def set_light(self, light):
         self.light_component = light
+
+    def set_ai(self, ai):
+        self.ai_component = ai
 
     def move(self, new):
         self.coord = new

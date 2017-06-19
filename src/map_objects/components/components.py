@@ -2,3 +2,4 @@ from move_component import MoveComponent
 from light_component import LightComponent
 from color_component import ColorComponent
 from image_component import ImageComponent
+from ai_component import AIComponent
