@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from src.map.mapgen.level_gen import LevelGen
+from turn_tracker import TurnTracker
 
 
 class Game(object):
@@ -14,12 +15,13 @@ class Game(object):
         self.player_key = player_key
         self.objects = []
 
+        self.turn_tracker = TurnTracker(self)
+        self.turn = 'player'
+
         self.clock = pygame.time.Clock()
         self.tick = 0
 
         self.sub_screen = pygame.Surface((400*2, 300*2))
-
-        self.turn = 'player'
 
     def load_level(self):
 
@@ -64,14 +66,24 @@ class Game(object):
                         self.player.move_player('right')
                     elif event.key == K_LEFT:
                         self.player.move_player('left')
+                    elif event.key == K_SPACE:
+                        self.end_player_turn()
+                        pass  # player.pass
 
         return False
+
+    def end_player_turn(self):
+        self.turn = 'monster'
+
+    def end_monster_turn(self):
+        self.turn = 'player'
 
     def run(self):
 
         self.level.redraw_manager.run()
 
-        # run ai
+        if self.turn == 'monster':
+            self.turn_tracker.run()
         # run effects
 
     def main(self):

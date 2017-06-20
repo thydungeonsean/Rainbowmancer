@@ -13,6 +13,7 @@ class Player(Actor):
     def __init__(self, coord, player_key):
 
         Actor.__init__(self, None, coord, player_key, color=None)
+        self.team = 'player'
 
     def initialize(self, level):
         self.set_map(level)
@@ -25,3 +26,5 @@ class Player(Actor):
         if self.move_component.can_move(new):
             self.move(new)
             self.map.fov_map.recompute_fov()
+            self.map.path_finding_map.compute()
+            self.map.game.end_player_turn()

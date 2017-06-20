@@ -20,6 +20,7 @@ class MoveComponent(object):
             for object in blocking_objects:
                 if object.blocks:
                     self.owner.bump(object)
+                    print self.owner.team + ' bump ' + str(object.team)
                     return False
 
         return True

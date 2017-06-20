@@ -14,6 +14,8 @@ class MapObject(object):
         self.light_component = None
         self.ai_component = None
 
+        self.team = None
+
         self.blocks = True
         self.block_sight = False
 

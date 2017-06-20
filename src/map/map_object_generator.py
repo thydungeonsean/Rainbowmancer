@@ -1,4 +1,4 @@
-from src.map_objects.actor import Actor
+from src.map_objects.monster import Monster
 from src.map_objects.player import Player
 from src.map_objects.crystal import Crystal
 from src.map_objects.door import Door
@@ -13,10 +13,6 @@ class MapObjectGen(object):
     def add_map_object(self, obj):
 
         self.map.game.objects.append(obj)
-
-    def create_monster(self, name, coord):
-        m = Actor(self.map, coord, name)
-        self.add_map_object(m)
 
     def add_player(self, player_key, coord):
 
@@ -43,6 +39,6 @@ class MapObjectGen(object):
 
     def add_random_monster(self, point):
 
-        monster = Actor(self.map, point, 'gnome')
+        monster = Monster(self.map, point, 'gnome')
 
         self.add_map_object(monster)

@@ -19,7 +19,7 @@ class Level(object):
         self.terrain_map = None
         self.tile_map = None
         self.color_map = None
-        self.fov_map = FOVMap(self)
+        self.fov_map = self.set_fov()
         self.path_finding_map = PathFindingMap(self)
 
         self.map_image = None
@@ -37,6 +37,7 @@ class Level(object):
     def load_player(self, player):
         self.fov_map.set_player(player)
         self.fov_map.recompute_fov()
+        self.path_finding_map.compute()
 
     def set_terrain_map(self, terrain_map):
         self.terrain_map = terrain_map
@@ -44,6 +45,11 @@ class Level(object):
 
     def set_map_image(self, map_image):
         self.map_image = map_image
+
+    def set_fov(self):
+        # return FOVMap(self, pre_explored=False, fov_on=True)
+
+        return FOVMap(self, pre_explored=False, fov_on=True)
 
     @property
     def w(self):

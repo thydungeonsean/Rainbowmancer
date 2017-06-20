@@ -6,22 +6,29 @@ class PathFindingMap(object):
 
         self.level = level
 
+        self.approach_map = None
+        self.range_map = None
+
     @property
     def terrain(self):
         return self.level.terrain_map
 
     def compute(self):
-        pass
+
+        player = self.level.game.player.coord
+
+        self.approach_map = self.get_dijkstra([player])
+        self.range_map = self.get_dijkstra(self.get_range_source(player))
 
     def get_next_edge(self, edge):
 
-        next = set()
+        next_edge = set()
 
         for point in edge:
             adj = self.terrain.get_adj(point)
             for a in adj:
-                next.add(a)
-        return list(next)
+                next_edge.add(a)
+        return list(next_edge)
 
     def get_dijkstra(self, edge):
         d_map = {}
@@ -43,3 +50,15 @@ class PathFindingMap(object):
             value += 1
 
         return d_map
+
+    def get_range_source(self, (x, y)):
+
+        target_locations = []
+
+        for i in range(2, 8):
+            target_locations.extend([(x+i, y), (x-i, y), (x, y+i), (x, y-i)])
+
+        target_locations = list(filter(self.level.fov_map.point_is_visible, target_locations))
+
+        return target_locations
+
