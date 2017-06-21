@@ -14,6 +14,8 @@ class Actor(MapObject):
         self.set_color(color)
         self.set_move(self.get_move_component(color))
 
+        self.object_type = 'actor'
+
     def get_move_component(self, color):
 
         return MoveComponent(self, self.map, color)

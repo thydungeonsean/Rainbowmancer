@@ -19,7 +19,7 @@ class TurnTracker(object):
             remaining = filter(lambda x: x.turn_component.get_state() == 'delay', remaining)
             map(lambda x: x.turn_component.refresh(), remaining)
             for x in remaining:
-                print x.turn_component.get_state
+                print x.turn_component.get_state()
 
         map(lambda x: x.turn_component.refresh(), self.monster_list)
 

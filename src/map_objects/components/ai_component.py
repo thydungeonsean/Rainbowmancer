@@ -27,19 +27,17 @@ class AIComponent(object):
 
     def check_state(self):
 
-        coord = self.owner.coord
         if self.state in (0, 1):  # check if sees the player
-            if self.owner.map.fov_map.point_is_visible(coord):
+            if self.can_see_player():
                 self.state = 2
         elif self.state == 2:  # if lost sight of player...
-            if not self.owner.map.fov_map.point_is_visible(coord):
+            if not self.can_see_player():
                 self.state = 1
 
     def run_state(self):
-        if self.state in (0, 3):
-            # take turn on tracker
+        if self.state in (0, 3):  # stunned or waiting
             # do nothing
-            pass
+            self.owner.turn_component.take_turn()
         elif self.state == 1:
             self.wander()
         elif self.state == 2:
@@ -62,6 +60,7 @@ class AIComponent(object):
     def engage(self):
 
         # if creature can trigger ability, it does it now and spends turn
+        # also check for bump to attack?
 
         dijkstra = self.get_dijkstra()
         adj = self.get_adj()
@@ -74,12 +73,41 @@ class AIComponent(object):
         adj = sorted(weight_map.keys(), key=lambda x: weight_map[x])
 
         for point in adj:
-            if self.owner.move_component.can_move(point):
+            can_move = self.owner.move_component.can_move(point)
+            can_bump, target = self.owner.move_component.can_bump(point)
+
+            if can_move:
                 self.owner.move(point)
                 self.owner.turn_component.take_turn()
                 break
+            elif can_bump:
+                self.owner.bump(target)
+                self.owner.turn_component.take_turn()
+                break
 
-
+        # handle no moves, no bumps
+        try_again = False
+        for point in adj:
+            monster = self.monster_on_point(point)
+            if monster is not None and monster.turn_component.state in (0, 2):
+                self.owner.turn_component.delay()
+                try_again = True
+                break
+        # might need to enforce a retry limit counter per creature
+        if not try_again:
+            self.owner.turn_component.take_turn()  # completely blocked for the turn, pass
 
     def get_dijkstra(self):
         return self.owner.map.path_finding_map.approach_map
+
+    def can_see_player(self):
+        return self.owner.map.fov_map.point_is_visible(self.owner.coord)
+
+    def monster_on_point(self, point):
+        monster = None
+        monsters = filter(lambda x: x.coord == point and x.object_type == 'monster', self.owner.map.game.objects)
+        if monsters:
+            monster = monsters.pop()
+
+        return monster
+

@@ -23,8 +23,15 @@ class Player(Actor):
 
         mx, my = Player.move_code[code]
         new = self.coord[0]+mx, self.coord[1]+my
-        if self.move_component.can_move(new):
+
+        can_move = self.move_component.can_move(new)
+        can_bump, target = self.move_component.can_bump(new)
+
+        if can_move:
             self.move(new)
             self.map.fov_map.recompute_fov()
             self.map.path_finding_map.compute()
+            self.map.game.end_player_turn()
+        elif can_bump:
+            self.bump(target)
             self.map.game.end_player_turn()

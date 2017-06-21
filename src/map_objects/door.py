@@ -12,6 +12,7 @@ class Door(MapObject):
 
         self.state = 0  # closed
         self.block_sight = True
+        self.object_type = 'door'
 
     def on_bump(self):
         if self.state == 0:

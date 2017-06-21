@@ -12,3 +12,5 @@ class Monster(Actor):
         self.turn_component = TurnComponent(self)
         self.set_ai(AIComponent(self))
 
+        self.object_type = 'monster'
+

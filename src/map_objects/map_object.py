@@ -5,6 +5,8 @@ class MapObject(object):
 
     def __init__(self):
 
+
+
         self.map = None
         self.coord = None
 
@@ -15,6 +17,7 @@ class MapObject(object):
         self.ai_component = None
 
         self.team = None
+        self.object_type = None
 
         self.blocks = True
         self.block_sight = False

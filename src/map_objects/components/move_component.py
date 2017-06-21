@@ -14,15 +14,30 @@ class MoveComponent(object):
             # cannot move through wall, stalagtite, or brazier
             return False
 
-        objects = self.map.game.objects
-        blocking_objects = filter(lambda x: x.coord == point, objects)
-        if blocking_objects:
-            for object in blocking_objects:
-                if object.blocks:
-                    self.owner.bump(object)
-                    print self.owner.team + ' bump ' + str(object.team)
+        blocking_objects = filter(lambda x: x.coord == point, self.map.game.objects)
+        if blocking_objects:  # there is an object on point
+            for obj in blocking_objects:
+                if obj.blocks:
                     return False
+
+        # for monsters, cannot move into opposed color
 
         return True
 
-        # for monsters, cannot move into opposed color
+    def can_bump(self, point):
+
+        blocking_objects = filter(lambda x: x.coord == point, self.map.game.objects)
+
+        for obj in blocking_objects:
+            if obj.blocks:
+
+                # bump object if object team doesn't match yours
+                if self.opposed_team(obj):
+                    return True, obj
+                elif obj.object_type == 'door':  # monsters can open doors
+                    return True, obj
+
+        return False, None
+
+    def opposed_team(self, obj):
+        return obj.team is not None and obj.team != self.owner.team
