@@ -15,6 +15,8 @@ class AIComponent(object):
         self.owner = owner
         self.state = choice((0, 1))
 
+        self.retry_count = 0
+
     def stun(self):
         self.state = 3
 
@@ -38,6 +40,7 @@ class AIComponent(object):
         if self.state in (0, 3):  # stunned or waiting
             # do nothing
             self.owner.turn_component.take_turn()
+            self.refresh()
         elif self.state == 1:
             self.wander()
         elif self.state == 2:
@@ -62,13 +65,18 @@ class AIComponent(object):
         # if creature can trigger ability, it does it now and spends turn
         # also check for bump to attack?
 
+        px, py = self.owner.map.game.player.coord
+
         dijkstra = self.get_dijkstra()
         adj = self.get_adj()
         weight_map = {}
-        for point in adj:
-            value = dijkstra.get(point)
+        for x, y in adj:
+            value = dijkstra.get((x, y))
             if value is not None:
-                weight_map[point] = value
+                weight_map[(x, y)] = float(value)
+
+                if px == x or py == y:
+                    weight_map[(x, y)] += .5
 
         adj = sorted(weight_map.keys(), key=lambda x: weight_map[x])
 
@@ -76,26 +84,38 @@ class AIComponent(object):
             can_move = self.owner.move_component.can_move(point)
             can_bump, target = self.owner.move_component.can_bump(point)
 
-            if can_move:
+            if can_bump and target.team != self.owner.team:  # attack
+                self.owner.bump(target)
+                self.owner.turn_component.take_turn()
+                break
+            elif can_move:  # move  ---- TODO ensure we don't move rather than stand still if it doesn't make sense3
                 self.owner.move(point)
                 self.owner.turn_component.take_turn()
                 break
-            elif can_bump:
+            elif can_bump:  # open doors etc.
                 self.owner.bump(target)
                 self.owner.turn_component.take_turn()
                 break
 
         # handle no moves, no bumps
-        try_again = False
-        for point in adj:
-            monster = self.monster_on_point(point)
-            if monster is not None and monster.turn_component.state in (0, 2):
-                self.owner.turn_component.delay()
-                try_again = True
-                break
-        # might need to enforce a retry limit counter per creature
-        if not try_again:
-            self.owner.turn_component.take_turn()  # completely blocked for the turn, pass
+        if self.owner.turn_component.state == 0:  # have not taken a turn
+            if self.retry_count > 3:  # too many retries, just pass
+                self.owner.turn_component.take_turn()
+                self.retry_count = 0
+                return
+            try_again = False
+            for point in adj:
+                monster = self.monster_on_point(point)
+                if monster is not None and monster.turn_component.state in (0, 2):
+                    self.owner.turn_component.delay()
+                    try_again = True
+                    self.retry_count += 1
+                    break
+            # might need to enforce a retry limit counter per creature
+
+            if not try_again:
+                self.owner.turn_component.take_turn()  # completely blocked for the turn, pass
+                self.retry_count = 0
 
     def get_dijkstra(self):
         return self.owner.map.path_finding_map.approach_map
