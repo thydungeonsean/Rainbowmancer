@@ -10,6 +10,9 @@ class MoveComponent(object):
 
     def can_move(self, point):
 
+        if point == self.owner.coord:
+            return True
+
         if self.map.terrain_map.get_tile(point) in (1, 2, 4, 8):
             # cannot move through wall, stalagtite, or brazier
             return False

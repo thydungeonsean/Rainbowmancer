@@ -68,7 +68,7 @@ class AIComponent(object):
         px, py = self.owner.map.game.player.coord
 
         dijkstra = self.get_dijkstra()
-        adj = self.get_adj()
+        adj = self.get_adj(center=True)
         weight_map = {}
         for x, y in adj:
             value = dijkstra.get((x, y))
@@ -77,6 +77,12 @@ class AIComponent(object):
 
                 if px == x or py == y:
                     weight_map[(x, y)] += .5
+
+                adj_monsters = self.adj_monsters((x, y))
+                weight_map[(x, y)] += .3 * adj_monsters
+
+                if self.point_next_to_wall((x, y)):
+                    weight_map[(x, y)] += .2
 
         adj = sorted(weight_map.keys(), key=lambda x: weight_map[x])
 
@@ -88,7 +94,7 @@ class AIComponent(object):
                 self.owner.bump(target)
                 self.owner.turn_component.take_turn()
                 break
-            elif can_move:  # move  ---- TODO ensure we don't move rather than stand still if it doesn't make sense3
+            elif can_move:  # move  ---- TODO ensure we don't move rather than stand still if it doesn't make sense
                 self.owner.move(point)
                 self.owner.turn_component.take_turn()
                 break
@@ -130,4 +136,20 @@ class AIComponent(object):
             monster = monsters.pop()
 
         return monster
+
+    def adj_monsters(self, (x, y)):
+
+        adj = set(self.owner.map.terrain_map.get_adj((x, y)))
+        if self.owner.coord in adj:
+            adj.remove(self.owner.coord)
+        adj_monsters = filter(lambda x: x.coord in adj and x.team == 'monster', self.owner.map.game.objects)
+        return len(adj_monsters)
+
+    def point_next_to_wall(self, (x, y)):
+
+        adj = self.owner.map.terrain_map.get_adj((x, y))
+        for a in adj:
+            if self.owner.map.terrain_map.get_tile(a) in (1, 2):
+                return True
+        return False
 

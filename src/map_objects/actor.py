@@ -22,3 +22,6 @@ class Actor(MapObject):
 
     def bump(self, target):
         target.on_bump()
+
+    def on_bump(self):
+        self.color_component.flash()

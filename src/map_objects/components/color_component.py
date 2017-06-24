@@ -22,6 +22,7 @@ class ColorComponent(object):
         self.state = None  # TODO maybe state should be property referring to owner's state
         self.base_color = self.set_base_color(color)
         self.current_color = (0, 0, 0)
+        self.flashes = []
 
     @staticmethod
     def set_color_mode(color):
@@ -37,10 +38,19 @@ class ColorComponent(object):
         return ColorComponent.encode[color]
 
     def get_color(self, tick):
+
+        if self.flashes:
+            flash = self.flashes[0].get_color()
+            if flash is not None:
+                return flash
+
         if self.mode == 'reflect':
             return self.reflected_color(tick)
         elif self.mode == 'generate':
             return self.generated_color(tick)
+
+    def get_current_tile_hue(self):
+        return self.owner.map.color_map.get_tile_hue(self.owner.coord)
 
     def reflected_color(self, tick):
 
@@ -64,6 +74,9 @@ class ColorComponent(object):
             return self.get_boosted_color(base, tick)
         elif affinity == 'negative':
             return self.get_drained_color(base, tick)
+
+    def flash(self):
+        self.flashes.append(Flash(self))
 
     def get_affinity(self):
         point = self.owner.coord
@@ -98,3 +111,44 @@ class ColorComponent(object):
     #         drain_mod = 30 * mod - (tick % 30) * mod
     #
     #     return drain_color(base, drain_mod)
+
+
+class Flash(object):
+
+    # seq = (0, 1, 1, 0, 0, 1, 1, 0, 0)
+    seq = (0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0)
+
+    def __init__(self, color_component):
+        self.color_component = color_component
+        self.tick = 0
+
+        self.flash_color = self.set_flash_color()
+
+    def get_color(self):
+
+        self.tick += 1
+        if self.tick >= len(Flash.seq):
+            self.end_flash()
+            return None
+
+        if Flash.seq[self.tick] == 1:
+            return self.flash_color
+        else:
+            return None
+
+    def set_flash_color(self):
+
+        if self.color_component.mode == 'generate':
+            if self.color_component.base_color == 0:
+                return hue_key[1][5]  # red flash
+            else:
+                return hue_key[0][5]  # white flash
+        elif self.color_component.mode == 'reflect':
+            if self.color_component.get_current_tile_hue() == 0:
+                return hue_key[1][5]  # red flash
+            else:
+                return hue_key[0][5]
+
+    def end_flash(self):
+        self.color_component.flashes.remove(self)
+
