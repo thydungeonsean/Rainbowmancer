@@ -5,8 +5,6 @@ class MapObject(object):
 
     def __init__(self):
 
-
-
         self.map = None
         self.coord = None
 

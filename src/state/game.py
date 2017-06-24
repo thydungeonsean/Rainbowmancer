@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from src.map.mapgen.level_gen import LevelGen
 from turn_tracker import TurnTracker
+from effect_tracker import EffectTracker
 
 
 class Game(object):
@@ -17,6 +18,8 @@ class Game(object):
 
         self.turn_tracker = TurnTracker(self)
         self.turn = 'player'
+
+        self.effect_tracker = EffectTracker(self)
 
         self.clock = pygame.time.Clock()
         self.tick = 0
@@ -46,6 +49,9 @@ class Game(object):
         for object in self.objects:
             object.draw(self.sub_screen, self.tick)
 
+        for effect in self.effect_tracker.effects:
+            effect.draw(self.sub_screen, self.tick)
+
         # pygame.transform.scale(self.sub_screen, (sw*2, sh*2), screen)
         screen.blit(self.sub_screen, self.sub_screen.get_rect())
 
@@ -57,20 +63,23 @@ class Game(object):
                 if event.key == K_ESCAPE:
                     return True
 
-                if self.turn == 'player':
-                    if event.key == K_UP:
-                        self.player.move_player('up')
-                    elif event.key == K_DOWN:
-                        self.player.move_player('down')
-                    elif event.key == K_RIGHT:
-                        self.player.move_player('right')
-                    elif event.key == K_LEFT:
-                        self.player.move_player('left')
-                    elif event.key == K_SPACE:
-                        self.end_player_turn()
-                        pass  # player.pass
+                if self.turn == 'player' and self.effect_tracker.effects_clear():
+                    self.handle_player_input(event)
 
         return False
+
+    def handle_player_input(self, event):
+        if event.key == K_UP:
+            self.player.move_player('up')
+        elif event.key == K_DOWN:
+            self.player.move_player('down')
+        elif event.key == K_RIGHT:
+            self.player.move_player('right')
+        elif event.key == K_LEFT:
+            self.player.move_player('left')
+        elif event.key == K_SPACE:
+            self.end_player_turn()
+            pass  # player.pass
 
     def end_player_turn(self):
         self.turn = 'monster'
@@ -82,9 +91,11 @@ class Game(object):
 
         self.level.redraw_manager.run()
 
-        if self.turn == 'monster':
+        if self.turn == 'monster' and self.effect_tracker.effects_clear():
             self.turn_tracker.run()
         # run effects
+
+        self.effect_tracker.run()
 
     def main(self):
 

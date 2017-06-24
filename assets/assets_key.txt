@@ -38,6 +38,32 @@
 [b: 0: 1]
 ]
 
+
+:projectile sets:
+[
+[bolt: 0: 11]
+]
+
+:projectile set tiles:
+[
+[a: 0: 0]
+[b: 0: 1]
+]
+
+:effect sets:
+[
+[explode: 0: 12]
+]
+
+:effect set tiles:
+[
+[1: 0: 0]
+[2: 1: 0]
+[3: 2: 0]
+[4: 3: 0]
+[5: 4: 0]
+]
+
 :wall sets:
 [
 [dungeon: 1: 1]

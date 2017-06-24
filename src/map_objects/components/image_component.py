@@ -3,10 +3,10 @@ from src.image.tileset import TileSet
 
 class ImageComponent(object):
 
-    def __init__(self, owner, img_id):
+    def __init__(self, owner, img_id, tile_set='creature'):
 
         self.owner = owner
-        self.tileset = TileSet('creature', img_id)
+        self.tileset = TileSet(tile_set, img_id)
 
     @property
     def coord(self):
@@ -32,4 +32,20 @@ class ImageComponent(object):
             return 'a'
         else:
             return 'b'
+
+
+class EffectImageComponent(ImageComponent):
+
+    def __init__(self, owner, img_id, tile_set='effect'):
+        ImageComponent.__init__(self, owner, img_id, tile_set=tile_set)
+        self.frame = 'a'
+
+    def get_frame(self, tick):
+        return self.frame
+
+    def change_frame(self):
+        if self.frame == 'a':
+            self.frame = 'b'
+        else:
+            self.frame = 'a'
 

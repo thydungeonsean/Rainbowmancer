@@ -18,6 +18,8 @@ class PathFindingMap(object):
         player = self.level.game.player.coord
 
         self.approach_map = self.get_dijkstra([player])
+        #self.approach_map[player] = -1
+        # self.mark_monsters(self.approach_map)
         self.range_map = self.get_dijkstra(self.get_range_source(player))
 
     def get_next_edge(self, edge):
@@ -61,4 +63,24 @@ class PathFindingMap(object):
         target_locations = list(filter(self.level.fov_map.point_is_visible, target_locations))
 
         return target_locations
+
+    def mark_monsters(self, d_map):
+
+        monsters = filter(lambda x: x.team == 'monster', self.level.game.objects)
+        monster_coords = set([x.coord for x in monsters])
+
+        for point in list(monster_coords):
+            d_map[point] += 1
+            adj = self.level.terrain_map.get_adj(point)
+            for a in adj:
+                if a in monster_coords:
+                    d_map[a] += 1
+                    continue
+
+    def around_player(self):
+
+        player = self.level.game.player.coord
+        adj = self.level.terrain_map.get_adj(player)
+        return adj
+
 

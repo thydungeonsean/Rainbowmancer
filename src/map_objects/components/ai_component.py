@@ -78,6 +78,9 @@ class AIComponent(object):
                 if px == x or py == y:
                     weight_map[(x, y)] += .5
 
+                if self.adj_to_player((x, y)):
+                    weight_map[(x, y)] -= .6
+
                 adj_monsters = self.adj_monsters((x, y))
                 weight_map[(x, y)] += .3 * adj_monsters
 
@@ -152,4 +155,10 @@ class AIComponent(object):
             if self.owner.map.terrain_map.get_tile(a) in (1, 2):
                 return True
         return False
+
+    def adj_to_player(self, point):
+
+        player = self.owner.map.game.player.coord
+        adj = self.owner.map.terrain_map.get_adj(player)
+        return point in adj
 
