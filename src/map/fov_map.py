@@ -11,7 +11,7 @@ class FOVMap(object):
     def all_visible(self, point):
         return self.explore_map.get(point) is not None
 
-    def __init__(self, level, pre_explored=False, fov_on=True):
+    def __init__(self, level, pre_explored=False, fov_on=False):
 
         self.level = level
         self.player = None

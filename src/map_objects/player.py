@@ -1,4 +1,5 @@
 from actor import Actor
+from components.stat_component import StatComponent
 
 
 class Player(Actor):
@@ -15,7 +16,9 @@ class Player(Actor):
         Actor.__init__(self, None, coord, player_key, color=None)
         self.team = 'player'
 
-        self.mode = 'bolt'
+        self.mode = 'move'
+
+        self.set_stats(StatComponent(self, health=20))
 
     def initialize(self, level):
         self.set_map(level)
@@ -101,4 +104,7 @@ class Player(Actor):
         if not self.map.fov_map.point_is_visible(coord):  # can't shoot beyond fov
             return True
         return not self.map.fov_map.point_transparent(coord)  # can't shoot beyond objects that block sight
+
+    def attack(self, target):
+        target.ai_component.stun()
 

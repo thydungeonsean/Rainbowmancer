@@ -1,6 +1,7 @@
 from actor import Actor
 from components.turn_component import TurnComponent
 from components.ai_component import AIComponent
+from components.stat_component import StatComponent
 
 
 class Monster(Actor):
@@ -11,6 +12,7 @@ class Monster(Actor):
         self.team = 'monster'
         self.turn_component = TurnComponent(self)
         self.set_ai(AIComponent(self))
+        self.set_stats(StatComponent(self))
 
         self.object_type = 'monster'
 

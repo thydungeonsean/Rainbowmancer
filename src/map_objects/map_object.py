@@ -13,6 +13,7 @@ class MapObject(object):
         self.color_component = None
         self.light_component = None
         self.ai_component = None
+        self.stat_component = None
 
         self.team = None
         self.object_type = None

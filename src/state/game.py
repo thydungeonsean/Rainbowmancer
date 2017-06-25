@@ -9,6 +9,9 @@ class Game(object):
 
     FPS = 60
 
+    zoom_screen_w = 9
+    zoom_screen_h = 7
+
     def __init__(self, player_key):
 
         self.level = None
@@ -24,7 +27,11 @@ class Game(object):
         self.clock = pygame.time.Clock()
         self.tick = 0
 
-        self.sub_screen = pygame.Surface((400*2, 300*2))
+        self.sub_screen = pygame.Surface((960, 720)).convert()
+
+        self.screen_mode = 'full'
+        self.zoomed_sub_screen = pygame.Surface((19 * 16, 15 * 24)).convert()
+        self.zoomed_sub_screen_scale = pygame.Surface((19 * 16 * 2, 15 * 24 * 2)).convert()
 
     def load_level(self):
 
@@ -40,28 +47,66 @@ class Game(object):
 
     def draw(self):
 
-        screen = pygame.display.get_surface()
-        sw = self.sub_screen.get_width()
-        sh = self.sub_screen.get_height()
-
         self.level.map_image.draw(self.sub_screen, self.tick)
 
-        for object in self.objects:
-            object.draw(self.sub_screen, self.tick)
+        for obj in self.objects:
+            obj.draw(self.sub_screen, self.tick)
 
         for effect in self.effect_tracker.effects:
             effect.draw(self.sub_screen, self.tick)
 
-        # pygame.transform.scale(self.sub_screen, (sw*2, sh*2), screen)
+        if self.screen_mode == 'full':
+            self.draw_full()
+        elif self.screen_mode == 'zoomed':
+            self.draw_zoomed()
+
+    def draw_full(self):
+        screen = pygame.display.get_surface()
         screen.blit(self.sub_screen, self.sub_screen.get_rect())
+
+    def draw_zoomed(self):
+        screen = pygame.display.get_surface()
+        sw = self.zoomed_sub_screen_scale.get_width()
+        sh = self.zoomed_sub_screen_scale.get_height()
+
+        sub_screen_offset = self.get_screen_coord()
+        rect = self.sub_screen.get_rect()
+        rect.topleft = sub_screen_offset
+
+        self.zoomed_sub_screen.fill((0, 0, 0))
+        self.zoomed_sub_screen.blit(self.sub_screen, rect)
+
+        pygame.transform.scale(self.zoomed_sub_screen, (sw, sh), self.zoomed_sub_screen_scale)
+        screen.blit(self.zoomed_sub_screen_scale, self.zoomed_sub_screen_scale.get_rect())
+
+    def get_screen_coord(self):
+        x, y = self.player.coord
+
+        sx = x - Game.zoom_screen_w
+        sy = y - Game.zoom_screen_h
+
+        return sx * -16, sy * -24
+
+    def switch_screen_mode(self):
+        if self.screen_mode == 'full':
+            self.screen_mode = 'zoomed'
+        elif self.screen_mode == 'zoomed':
+            self.screen_mode = 'full'
 
     def handle_input(self):
 
         for event in pygame.event.get():
 
-            if event.type == KEYDOWN:
+            if event.type == QUIT:
+                return True
+
+            elif event.type == KEYDOWN:
+
                 if event.key == K_ESCAPE:
                     return True
+
+                elif event.key == K_SLASH:
+                    self.switch_screen_mode()
 
                 if self.turn == 'player' and self.effect_tracker.effects_clear():
                     self.handle_player_input(event)
