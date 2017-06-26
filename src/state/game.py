@@ -90,6 +90,8 @@ class Game(object):
     def switch_screen_mode(self):
         if self.screen_mode == 'full':
             self.screen_mode = 'zoomed'
+            self.sub_screen.fill((0, 0, 0))
+            self.draw_full()
         elif self.screen_mode == 'zoomed':
             self.screen_mode = 'full'
 

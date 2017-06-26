@@ -46,6 +46,8 @@ class MapObject(object):
         self.coord = new
         if self.light_component is not None:
             self.light_component.move(new)
+        if self.stat_component is not None:
+            self.stat_component.state_update()
 
     def draw(self, surface, tick):
 

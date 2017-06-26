@@ -10,9 +10,10 @@ class Monster(Actor):
 
         Actor.__init__(self, map, coord, name, color)
         self.team = 'monster'
+        self.object_type = 'monster'
         self.turn_component = TurnComponent(self)
         self.set_ai(AIComponent(self))
         self.set_stats(StatComponent(self))
 
-        self.object_type = 'monster'
+
 

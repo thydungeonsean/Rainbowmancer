@@ -33,8 +33,16 @@ class Actor(MapObject):
         self.color_component.flash()
 
     def attack(self, target):
+        self.stat_component.attack(target.stat_component)
+        self.trigger_attack_effects(target)
+
+    def trigger_attack_effects(self, target):
         pass
 
     def target_is_enemy(self, target):
 
         return target.team != self.team
+
+    def die(self):
+        self.map.game.objects.remove(self)
+        print self.object_type + ' died'

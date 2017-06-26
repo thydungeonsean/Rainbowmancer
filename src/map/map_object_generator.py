@@ -39,6 +39,6 @@ class MapObjectGen(object):
 
     def add_random_monster(self, point):
 
-        monster = Monster(self.map, point, 'gnome')
+        monster = Monster(self.map, point, 'gnome', color='green')
 
         self.add_map_object(monster)

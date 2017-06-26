@@ -24,6 +24,16 @@ class ColorComponent(object):
         self.current_color = (0, 0, 0)
         self.flashes = []
 
+    @property
+    def current_object_hue(self):
+        if self.mode == 'generate':
+            return self.base_color
+        elif self.mode == 'reflect':
+            return self.get_current_tile_hue()
+
+    def hue_interaction(self, target):
+        return hue_interaction(self.current_object_hue, target.owner.color_component.current_object_hue)
+
     @staticmethod
     def set_color_mode(color):
         if color is None:
@@ -68,11 +78,11 @@ class ColorComponent(object):
             return self.get_drained_color(base, tick)
 
         affinity = self.get_affinity()
-        if affinity is None:
+        if affinity in (None, 'strong_against'):
             return base
-        elif affinity == 'positive':
+        elif affinity == 'boosted':
             return self.get_boosted_color(base, tick)
-        elif affinity == 'negative':
+        elif affinity == 'weak_against':
             return self.get_drained_color(base, tick)
 
     def flash(self):

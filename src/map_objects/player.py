@@ -15,6 +15,7 @@ class Player(Actor):
 
         Actor.__init__(self, None, coord, player_key, color=None)
         self.team = 'player'
+        self.object_type = 'player'
 
         self.mode = 'move'
 
@@ -50,6 +51,7 @@ class Player(Actor):
     def fire_bolt(self, target):
 
         print 'shoot at ' + str(target)
+        self.stat_component.fire_bolt(target.stat_component)
         self.map.game.end_player_turn()
         self.map.game.effect_tracker.add_bolt(self, target, 'red')
 
@@ -105,6 +107,6 @@ class Player(Actor):
             return True
         return not self.map.fov_map.point_transparent(coord)  # can't shoot beyond objects that block sight
 
-    def attack(self, target):
+    def trigger_attack_effects(self, target):
         target.ai_component.stun()
 

@@ -76,8 +76,18 @@ hue_key = {
 }
 
 
-hue_enmities = {
+hue_strengths = {
     0: {},
+    1: {2, 0},
+    2: {3, 0},
+    3: {1, 0},
+    4: {6, 3, 0},
+    5: {4, 2, 0},
+    6: {5, 1, 0}
+}
+
+hue_weaknesses = {
+    0: {1, 2, 3, 4, 5, 6},
     1: {3, 6},
     2: {1, 5},
     3: {2, 4},
@@ -166,8 +176,10 @@ def get_hue(r, g, b):
 def hue_interaction(object_hue, tile_hue):
 
     if object_hue == tile_hue and object_hue != 0:
-        return 'positive'
-    elif tile_hue in hue_enmities[object_hue]:
-        return 'negative'
+        return 'boosted'
+    elif tile_hue in hue_weaknesses[object_hue]:
+        return 'weak_against'
+    elif tile_hue in hue_strengths[object_hue]:
+        return 'strong_against'
     else:
         return None
