@@ -126,3 +126,19 @@
 
 ]
 
+:border sets:
+[
+[main: 11: 0]
+]
+
+:border set tiles:
+[
+[top_left: 0: 0]
+[top_right: 1: 0]
+[bottom_left: 2: 0]
+[bottom_right: 3: 0]
+[top: 4: 0]
+[bottom: 4: 0]
+[left: 5: 0]
+[right: 5: 0]
+] 

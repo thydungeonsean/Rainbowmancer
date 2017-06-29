@@ -6,12 +6,19 @@ import pygame
 class TileSet(object):
 
     enviro = None
+    border = None
 
     @classmethod
     def get_enviro_tiles(cls):
         if cls.enviro is None:
             cls.enviro = cls('enviro', 'main')
         return cls.enviro
+
+    @classmethod
+    def get_border_tiles(cls):
+        if cls.border is None:
+            cls.border = cls('border', 'main')
+        return cls.border
 
     def __init__(self, set_type, set_id):
         

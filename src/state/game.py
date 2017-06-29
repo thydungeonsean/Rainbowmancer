@@ -3,6 +3,7 @@ from pygame.locals import *
 from src.map.mapgen.level_gen import LevelGen
 from turn_tracker import TurnTracker
 from effect_tracker import EffectTracker
+from src.state.ui.ui import UI
 
 
 class Game(object):
@@ -19,6 +20,8 @@ class Game(object):
         self.player_key = player_key
         self.objects = []
 
+        self.ui = UI(self)
+
         self.turn_tracker = TurnTracker(self)
         self.turn = 'player'
 
@@ -32,6 +35,8 @@ class Game(object):
         self.screen_mode = 'full'
         self.zoomed_sub_screen = pygame.Surface((19 * 16, 15 * 24)).convert()
         self.zoomed_sub_screen_scale = pygame.Surface((19 * 16 * 2, 15 * 24 * 2)).convert()
+        self.zoomed_sub_screen_scale_rect = self.zoomed_sub_screen_scale.get_rect()
+        self.zoomed_sub_screen_scale_rect.topleft = (56, 0)
 
     def load_level(self):
 
@@ -60,6 +65,8 @@ class Game(object):
         elif self.screen_mode == 'zoomed':
             self.draw_zoomed()
 
+        self.ui.draw(pygame.display.get_surface(), self.tick)
+
     def draw_full(self):
         screen = pygame.display.get_surface()
         screen.blit(self.sub_screen, self.sub_screen.get_rect())
@@ -77,7 +84,7 @@ class Game(object):
         self.zoomed_sub_screen.blit(self.sub_screen, rect)
 
         pygame.transform.scale(self.zoomed_sub_screen, (sw, sh), self.zoomed_sub_screen_scale)
-        screen.blit(self.zoomed_sub_screen_scale, self.zoomed_sub_screen_scale.get_rect())
+        screen.blit(self.zoomed_sub_screen_scale, self.zoomed_sub_screen_scale_rect)
 
     def get_screen_coord(self):
         x, y = self.player.coord

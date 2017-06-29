@@ -37,6 +37,9 @@ class Image(object):
     
     def position(self, (x, y)):
         self.rect.topleft = x * Image.TILEW, y * Image.TILEH
+
+    def position_pixel(self, (x, y)):
+        self.rect.topleft = x, y
     
     def draw(self, surface):
         surface.blit(self.surf, self.rect)
