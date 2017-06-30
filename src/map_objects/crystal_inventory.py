@@ -33,7 +33,7 @@ class CrystalInventory(object):
 
         for color in CrystalInventory.colors:
             self.crystal_num[color] = kwargs.get(color, CrystalInventory.default_num[color])
-            self.crystal_num[color] = kwargs.get(''.join((color, '_level')), CrystalInventory.default_level[color])
+            self.crystal_level[color] = kwargs.get(''.join((color, '_level')), CrystalInventory.default_level[color])
 
     def spend_crystal(self, color):
         self.crystal_num[color] -= 1

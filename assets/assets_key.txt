@@ -129,6 +129,7 @@
 :border sets:
 [
 [main: 11: 0]
+[ornate: 12: 0]
 ]
 
 :border set tiles:

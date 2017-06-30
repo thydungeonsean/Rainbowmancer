@@ -14,9 +14,9 @@ class Image(object):
         return c
         
     @classmethod
-    def blank(cls):
+    def blank(cls, w, h):
         c = cls()
-        c.surf = pygame.Surface((cls.TILEW, cls.TILEH))
+        c.surf = pygame.Surface((w, h))
         c.surf.fill((0, 0, 0))
         c.rect = c.surf.get_rect()
         return c

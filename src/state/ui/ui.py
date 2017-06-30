@@ -8,12 +8,15 @@ class UI(object):
         self.game = game
 
         self.ui_objects = []
+        self.panels = {}
 
         self.initialize()
 
     def initialize(self):
 
-        self.add_ui_object(CrystalPanel(self))
+        crystal = CrystalPanel(self)
+        self.add_ui_object(crystal)
+        self.panels['crystal'] = crystal
 
     def add_ui_object(self, obj):
         self.ui_objects.append(obj)
@@ -24,7 +27,7 @@ class UI(object):
     def draw(self, surface, tick):
 
         for obj in self.ui_objects:
-            obj.draw(surface)
+            obj.draw(surface, tick)
 
     def run(self):
         pass

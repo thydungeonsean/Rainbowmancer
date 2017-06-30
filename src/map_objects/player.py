@@ -1,5 +1,6 @@
 from actor import Actor
 from components.stat_component import StatComponent
+from crystal_inventory import CrystalInventory
 
 
 class Player(Actor):
@@ -20,6 +21,8 @@ class Player(Actor):
         self.mode = 'move'
 
         self.set_stats(StatComponent(self, health=20))
+
+        self.crystal_inventory = CrystalInventory()
 
     def initialize(self, level):
         self.set_map(level)

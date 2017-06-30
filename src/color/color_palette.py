@@ -65,6 +65,9 @@ hue_names = {
 }
 
 
+hue_codes = {v: k for k, v in hue_names.iteritems()}
+
+
 hue_key = {
     0: white_shades,
     1: red_shades,

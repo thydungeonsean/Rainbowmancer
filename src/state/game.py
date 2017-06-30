@@ -30,7 +30,7 @@ class Game(object):
         self.clock = pygame.time.Clock()
         self.tick = 0
 
-        self.sub_screen = pygame.Surface((960, 720)).convert()
+        self.sub_screen = pygame.Surface((720, 720)).convert()
 
         self.screen_mode = 'full'
         self.zoomed_sub_screen = pygame.Surface((19 * 16, 15 * 24)).convert()
@@ -44,6 +44,7 @@ class Game(object):
 
         self.player = self.level.map_object_generator.add_player(self.player_key, self.level.player_start)
         self.level.load_player(self.player)
+        self.ui.panels['crystal'].load_player()
 
     def increment_tick(self):
         self.tick += 1

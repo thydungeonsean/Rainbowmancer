@@ -7,6 +7,7 @@ class TileSet(object):
 
     enviro = None
     border = None
+    icons = None
 
     @classmethod
     def get_enviro_tiles(cls):
@@ -20,9 +21,16 @@ class TileSet(object):
             cls.border = cls('border', 'main')
         return cls.border
 
-    def __init__(self, set_type, set_id):
-        
-        self.sheet_key = 'assets_key'
+    @classmethod
+    def get_icon_tiles(cls):
+        if cls.icons is None:
+            cls.icons = cls('ui', 'ui', sheet='icons')
+        return cls.icons
+
+    def __init__(self, set_type, set_id, sheet='assets'):
+
+        self.sheet = sheet
+        self.sheet_key = ''.join((self.sheet, '_key'))
         self.tilesheet = self.load_tilesheet()
         
         self.tile_w, self.tile_h = self.load_tile_dimensions()
@@ -32,7 +40,7 @@ class TileSet(object):
         self.tiles = self.load_tiles()
        
     def load_tilesheet(self):
-        return pygame.image.load(''.join((os.path.dirname(__file__),'\\..\\..\\assets\\assets.png'))) 
+        return pygame.image.load(''.join((os.path.dirname(__file__), '\\..\\..\\assets\\', self.sheet, '.png')))
        
     def load_tile_dimensions(self):
         return get_tile_dimensions(self.sheet_key)
@@ -68,7 +76,7 @@ class TileSet(object):
         return tiles
             
     def set_tile_image(self, key):
-        tile = Image.blank()
+        tile = Image.blank(self.tile_w, self.tile_h)
         tx, ty = self.tileset_pos_dict[key]
         tile.surf.blit(self.tilesheet, (0, 0), (tx*self.tile_w, ty*self.tile_h, self.tile_w, self.tile_h))
         # tile.auto_scale()

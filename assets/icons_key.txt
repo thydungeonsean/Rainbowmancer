@@ -1,0 +1,30 @@
+:sheet_dim:
+[
+[11, 5]
+]
+
+:tile_dim:
+[
+[32, 32]
+]
+
+:colorkey:
+[
+[0, 0, 0]
+]
+
+:ui sets:
+[
+[ui: 0: 0]
+]
+
+:ui set tiles:
+[
+[red_crystal: 0: 0]
+[green_crystal: 0: 0]
+[blue_crystal: 0: 0]
+[yellow_crystal: 0: 0]
+[purple_crystal: 0: 0]
+[cyan_crystal: 0: 0]
+[white_crystal: 0: 0]
+]

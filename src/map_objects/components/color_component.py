@@ -71,15 +71,18 @@ class ColorComponent(object):
         else:
             return base
 
+    def get_base_color(self):
+        return hue_key[self.base_color][5]
+
     def generated_color(self, tick):
 
-        base = hue_key[self.base_color][5]
+        base = self.get_base_color()
         if self.state == 'weak':
             return self.get_drained_color(base, tick)
 
         affinity = self.get_affinity()
         if affinity in (None, 'strong_against'):
-            return base
+            return self.get_base_color()
         elif affinity == 'boosted':
             return self.get_boosted_color(base, tick)
         elif affinity == 'weak_against':

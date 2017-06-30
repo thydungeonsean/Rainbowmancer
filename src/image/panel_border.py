@@ -33,8 +33,11 @@ class PanelBorder(object):
             self.h = kwargs['h']
             self.pix_h = self.h * PanelBorder.tile_h
 
+        self.coord = kwargs.get('coord', (0, 0))
+
         self.image = self.set_image()
         self.rect = self.image.get_rect()
+        self.rect.topleft = self.coord
 
     def set_width(self, pix_w):
         pix_w = max((PanelBorder.min_w * PanelBorder.tile_w, pix_w))
@@ -61,6 +64,10 @@ class PanelBorder(object):
         self.draw_bottom_right_border(image)
 
         return image
+
+    def set_coord(self, coord):
+        self.coord = coord
+        self.rect.topleft = coord
 
     def get_top_left_tile(self, (x, y)):
 
