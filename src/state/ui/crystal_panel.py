@@ -104,10 +104,8 @@ class CrystalPanel(Panel):
 
             x += 1
 
-
-
-
-
+    def change(self):
+        self.needs_update = True
 
 
 from src.map_objects.components.color_component import ColorComponent

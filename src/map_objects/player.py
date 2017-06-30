@@ -22,7 +22,7 @@ class Player(Actor):
 
         self.set_stats(StatComponent(self, health=20))
 
-        self.crystal_inventory = CrystalInventory()
+        self.crystal_inventory = CrystalInventory(self)
 
     def initialize(self, level):
         self.set_map(level)
