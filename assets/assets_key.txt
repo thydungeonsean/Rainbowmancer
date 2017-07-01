@@ -142,4 +142,15 @@
 [bottom: 4: 0]
 [left: 5: 0]
 [right: 5: 0]
-] 
+]
+
+:ui sets:
+[
+[ui: 13: 0]
+]
+
+:ui set tiles:
+[
+[full_heart: 0: 0]
+[empty_heart: 1: 0]
+]

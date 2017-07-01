@@ -51,3 +51,6 @@ class Panel(object):
     def add_element(self, element):
         self.needs_update = True
         self.elements.append(element)
+
+    def change(self):
+        self.needs_update = True

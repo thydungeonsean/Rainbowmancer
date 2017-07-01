@@ -6,7 +6,12 @@ import pygame
 class TileSet(object):
 
     enviro = None
-    border = None
+    border = {
+        'main': None,
+        'ornate': None
+    }
+
+    ui = None
     icons = None
 
     @classmethod
@@ -16,10 +21,16 @@ class TileSet(object):
         return cls.enviro
 
     @classmethod
-    def get_border_tiles(cls):
-        if cls.border is None:
-            cls.border = cls('border', 'main')
-        return cls.border
+    def get_border_tiles(cls, style='main'):
+        if cls.border[style] is None:
+            cls.border[style] = cls('border', 'main')
+        return cls.border[style]
+
+    @classmethod
+    def get_ui_tiles(cls):
+        if cls.ui is None:
+            cls.ui = cls('ui', 'ui')
+        return cls.ui
 
     @classmethod
     def get_icon_tiles(cls):

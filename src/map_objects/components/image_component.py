@@ -23,6 +23,17 @@ class ImageComponent(object):
         tile.position(self.coord)
         tile.draw(surface)
 
+    def draw_at_coord(self, surface, tick, coord):
+
+        frame = self.get_frame(tick)
+        tile = self.tileset.get_tile_image(frame)
+
+        color = self.owner.color_component.get_color(tick)
+        tile.recolor(color)
+
+        tile.position_pixel(coord)
+        tile.draw(surface)
+
     def get_frame(self, tick):
         if tick < 15:
             return 'a'

@@ -1,7 +1,7 @@
 from panel import Panel
-from src.image.tileset import TileSet
 from src.color.color_palette import hue_codes, hue_key
 import pygame
+from crystal_icon import CrystalIcon
 
 
 class CrystalPanel(Panel):
@@ -10,7 +10,7 @@ class CrystalPanel(Panel):
     h = 240
 
     x = 960 - w
-    y = 720 - h
+    y = 120
     coord = (x, y)
 
     icon_y = 240 - 80
@@ -52,9 +52,9 @@ class CrystalPanel(Panel):
         for color in colors:
 
             # create crystal icon
-            crystal = CrystalIcon(color)
+            pos = (self.x + self.get_icon_x(x), self.y + cls.icon_y)
+            crystal = CrystalIcon(pos, color)
             self.crystals[color] = crystal
-            crystal.position((self.x + self.get_icon_x(x), self.y + cls.icon_y))
             self.add_element(crystal)
 
             x += 1
@@ -103,41 +103,3 @@ class CrystalPanel(Panel):
             self.surface.blit(bar, br)
 
             x += 1
-
-    def change(self):
-        self.needs_update = True
-
-
-from src.map_objects.components.color_component import ColorComponent
-
-
-class CrystalIcon(object):
-
-    def __init__(self, color):
-        self.image = TileSet.get_icon_tiles().get_tile_image(''.join((color, '_crystal')))
-        self.color_component = ColorComponent(self, color=color)
-        self.base_color = self.color_component.get_base_color()
-        self.image.recolor(self.base_color)
-        self.glow = True
-
-        self.tick = 0
-        self.count = 0
-
-    def draw(self, surface, tick):
-
-        if self.glow:
-
-            color = self.color_component.get_boosted_color(self.base_color, self.tick)
-            self.image.recolor(color)
-
-            self.count += 1
-            if self.count >= 5:
-                self.count = 0
-                self.tick += 1
-                if self.tick > 59:
-                    self.tick = 0
-
-        self.image.draw(surface)
-
-    def position(self, (x, y)):
-        self.image.position_pixel((x, y))

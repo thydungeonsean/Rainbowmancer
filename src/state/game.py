@@ -44,7 +44,10 @@ class Game(object):
 
         self.player = self.level.map_object_generator.add_player(self.player_key, self.level.player_start)
         self.level.load_player(self.player)
+
+        # bind ui panels to player
         self.ui.panels['crystal'].load_player()
+        self.ui.panels['character'].load_player()
 
     def increment_tick(self):
         self.tick += 1

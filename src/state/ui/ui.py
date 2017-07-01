@@ -1,4 +1,6 @@
 from crystal_panel import CrystalPanel
+from character_panel import CharacterPanel
+from ability_panel import AbilityPanel
 
 
 class UI(object):
@@ -17,6 +19,14 @@ class UI(object):
         crystal = CrystalPanel(self)
         self.add_ui_object(crystal)
         self.panels['crystal'] = crystal
+
+        character = CharacterPanel(self)
+        self.add_ui_object(character)
+        self.panels['character'] = character
+
+        ability = AbilityPanel(self)
+        self.add_ui_object(ability)
+        self.panels['ability'] = ability
 
     def add_ui_object(self, obj):
         self.ui_objects.append(obj)
