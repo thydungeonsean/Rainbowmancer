@@ -46,7 +46,20 @@ class Panel(object):
         return cx <= x < cx + self.w and cy <= y < cy + self.h
 
     def click(self, (x, y)):
-        map(lambda e: e.click((x, y)), self.elements)
+        if self.point_is_over((x, y)):
+            for e in self.elements:
+                click = e.click((x, y))
+                if click:
+                    return True
+        return False
+
+    def right_click(self, (x, y)):
+        if self.point_is_over((x, y)):
+            for e in self.elements:
+                click = e.right_click((x, y))
+                if click:
+                    return True
+        return False
 
     def add_element(self, element):
         self.needs_update = True

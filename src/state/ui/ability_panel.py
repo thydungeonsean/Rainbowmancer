@@ -14,11 +14,14 @@ class AbilityPanel(Panel):
     icon_margin = 20
 
     def __init__(self, ui):
+
         pix_w = AbilityPanel.w
         pix_h = AbilityPanel.h
         coord = AbilityPanel.coord
 
         Panel.__init__(self, ui, pix_w, pix_h, coord=coord)
+
+        self.inventory = None
 
         self.ability_slots = {}
         self.ability_positions = self.set_ability_positions()
@@ -29,16 +32,22 @@ class AbilityPanel(Panel):
 
         pass
 
+    def load_player(self):
+
+        self.inventory = self.ui.game.player.ability_inventory
+
+        self.initialize()
+
     @staticmethod
     def set_ability_positions():
 
-        ability = {}
+        ability_positions = {}
 
         for i in range(10):
 
             x = AbilityPanel.icon_x
             y = i * 32 + AbilityPanel.icon_margin
 
-            ability[i] = (x, y)
+            ability_positions[i] = (x, y)
 
-        return ability
+        return ability_positions

@@ -13,7 +13,6 @@ class PlayerStatComponent(StatComponent):
         self.health -= damage
         if self.health <= 0:
             self.die()
-
         self.update_panel()
 
     def heal(self, amnt):

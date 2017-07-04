@@ -1,6 +1,7 @@
-from actor import Actor
-from components.player_stat_component import PlayerStatComponent
-from crystal_inventory import CrystalInventory
+from src.map_objects.actor import Actor
+from src.map_objects.components.player_stat_component import PlayerStatComponent
+from src.map_objects.player.crystal_inventory import CrystalInventory
+from ability_inventory import AbilityInventory
 
 
 class Player(Actor):
@@ -23,6 +24,7 @@ class Player(Actor):
         self.set_stats(PlayerStatComponent(self, health=15))
 
         self.crystal_inventory = CrystalInventory(self)
+        self.ability_inventory = AbilityInventory(self)
 
     def initialize(self, level):
         self.set_map(level)

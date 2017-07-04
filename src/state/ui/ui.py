@@ -42,3 +42,18 @@ class UI(object):
     def run(self):
         pass
 
+    def click(self, point):
+
+        for panel in self.ui_objects:
+            clicked = panel.click(point)
+            if clicked:
+                return True
+        return False
+
+    def right_click(self, point):
+
+        for panel in self.ui_objects:
+            right_clicked = panel.right_click(point)
+            if right_clicked:
+                return True
+        return False

@@ -24,6 +24,7 @@ class Game(object):
 
         self.turn_tracker = TurnTracker(self)
         self.turn = 'player'
+        self.active_ability = None
 
         self.effect_tracker = EffectTracker(self)
 
@@ -32,7 +33,7 @@ class Game(object):
 
         self.sub_screen = pygame.Surface((720, 720)).convert()
 
-        self.screen_mode = 'full'
+        self.screen_mode = 'zoomed'
         self.zoomed_sub_screen = pygame.Surface((19 * 16, 15 * 24)).convert()
         self.zoomed_sub_screen_scale = pygame.Surface((19 * 16 * 2, 15 * 24 * 2)).convert()
         self.zoomed_sub_screen_scale_rect = self.zoomed_sub_screen_scale.get_rect()
@@ -48,6 +49,7 @@ class Game(object):
         # bind ui panels to player
         self.ui.panels['crystal'].load_player()
         self.ui.panels['character'].load_player()
+        self.ui.panels['ability'].load_player()
 
     def increment_tick(self):
         self.tick += 1
@@ -108,6 +110,8 @@ class Game(object):
 
     def handle_input(self):
 
+        # returns true to exit game
+
         for event in pygame.event.get():
 
             if event.type == QUIT:
@@ -122,7 +126,20 @@ class Game(object):
                     self.switch_screen_mode()
 
                 if self.turn == 'player' and self.effect_tracker.effects_clear():
-                    self.handle_player_input(event)
+                    if self.active_ability is not None:
+                        pass
+                    else:
+                        self.handle_player_input(event)
+
+            elif event.type == MOUSEBUTTONDOWN:
+
+                if event.button == 1:  # left click
+                    if not self.ui.click(pygame.mouse.get_pos()):  # no icon clicked
+                        pass  # handle clicking the screen
+
+                elif event.button == 3:  # right click
+                    if not self.ui.right_click(pygame.mouse.get_pos()):
+                        pass  # handle right clicking the screen
 
         return False
 

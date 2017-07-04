@@ -24,3 +24,23 @@ class Icon(object):
 
     def position(self, (x, y)):
         self.image.position_pixel((x, y))
+
+    def point_is_over(self, (x, y)):
+
+        cx, cy = self.coord
+        return cx <= x < cx + self.w and cy <= y < cy + self.h
+
+    def click(self, (x, y)):
+        if self.point_is_over((x, y)):
+            print 'clicked icon ' + str(self)
+            return True
+        else:
+            return False
+
+    def right_click(self, (x, y)):
+        if self.point_is_over((x, y)):
+            print 'right clicked icon ' + str(self)
+            return True
+        else:
+            return False
+

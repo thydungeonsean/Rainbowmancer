@@ -1,5 +1,5 @@
 from src.map_objects.monster import Monster
-from src.map_objects.player import Player
+from src.map_objects.player.player import Player
 from src.map_objects.crystal import Crystal
 from src.map_objects.door import Door
 from src.map_objects.brazier import Brazier

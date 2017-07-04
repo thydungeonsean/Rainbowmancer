@@ -29,7 +29,6 @@ class CharacterPanel(Panel):
 
         self.player = self.ui.game.player
 
-        self.update()
         self.initialize()
 
     def initialize(self):
@@ -71,7 +70,7 @@ class CharacterPanel(Panel):
 
         for i in range(max):
 
-            if i <= hp:
+            if i < hp:
                 tile = full
             else:
                 tile = empty
