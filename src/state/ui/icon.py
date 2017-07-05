@@ -23,6 +23,7 @@ class Icon(object):
         self.image.draw(surface)
 
     def position(self, (x, y)):
+        self.coord = (x, y)
         self.image.position_pixel((x, y))
 
     def point_is_over(self, (x, y)):

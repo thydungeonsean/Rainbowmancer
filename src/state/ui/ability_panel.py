@@ -26,17 +26,23 @@ class AbilityPanel(Panel):
         self.ability_slots = {}
         self.ability_positions = self.set_ability_positions()
 
-        self.initialize()
-
-    def initialize(self):
-
-        pass
-
     def load_player(self):
 
         self.inventory = self.ui.game.player.ability_inventory
 
         self.initialize()
+
+    def initialize(self):
+
+        slot = 0
+
+        for ability in self.inventory.ability_list:
+            ability.initialize(self, slot, self.get_ability_coord(slot))
+            self.ability_slots[slot] = ability
+
+            self.add_element(ability.icon)
+
+            slot += 1
 
     @staticmethod
     def set_ability_positions():
@@ -51,3 +57,8 @@ class AbilityPanel(Panel):
             ability_positions[i] = (x, y)
 
         return ability_positions
+
+    def get_ability_coord(self, slot):
+
+        x, y = self.ability_positions[slot]
+        return x + AbilityPanel.x, y + AbilityPanel.y
