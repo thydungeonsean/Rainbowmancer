@@ -7,7 +7,7 @@ class Ability(object):
 
         self.active = False
 
-        self.icon = AbilityIcon(self, ability_id, (0, 0))
+        self.icon = AbilityIcon(self, ability_id, (0, 0), color='red')
 
         self.inventory = inventory
 
@@ -27,3 +27,21 @@ class Ability(object):
 
     def set_panel_slot(self, slot):
         self.panel_slot = slot
+
+    def click(self):
+        if self.state == 0:
+            self.inventory.select_button(self.panel_slot)
+            self.state = 1
+        elif self.state == 1:
+            self.inventory.deselect_button(self.panel_slot)
+            self.state = 0
+            self.reset_ability()
+
+    def reset_ability(self):
+        pass  # clear target and boost crystals etc.
+
+    def activate(self):
+        self.icon.activate_icon()
+
+    def deactivate(self):
+        self.icon.deactivate_icon()

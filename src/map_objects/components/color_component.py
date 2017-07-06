@@ -47,6 +47,15 @@ class ColorComponent(object):
             return 0
         return ColorComponent.encode[color]
 
+    def get_base_color(self):
+        return hue_key[self.base_color][5]
+
+    def ready_shade(self):
+        return hue_key[self.base_color][5]
+
+    def inactive_shade(self):
+        return hue_key[self.base_color][1]
+
     def get_color(self, tick):
 
         if self.flashes:
@@ -70,9 +79,6 @@ class ColorComponent(object):
             return self.get_drained_color(base, tick)
         else:
             return base
-
-    def get_base_color(self):
-        return hue_key[self.base_color][5]
 
     def generated_color(self, tick):
 

@@ -19,7 +19,7 @@ class Player(Actor):
         self.team = 'player'
         self.object_type = 'player'
 
-        self.mode = 'bolt'
+        self.mode = 'move'
 
         self.set_stats(PlayerStatComponent(self, health=15))
 
