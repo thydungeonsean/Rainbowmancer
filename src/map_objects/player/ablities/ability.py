@@ -1,4 +1,5 @@
 from src.state.ui.ability_icon import AbilityIcon
+from pygame.locals import *
 
 
 class Ability(object):
@@ -30,7 +31,7 @@ class Ability(object):
 
     def click(self):
         if self.state == 0:
-            self.inventory.select_button(self.panel_slot)
+            self.inventory.select_button(self, self.panel_slot)
             self.state = 1
         elif self.state == 1:
             self.inventory.deselect_button(self.panel_slot)
@@ -45,3 +46,15 @@ class Ability(object):
 
     def deactivate(self):
         self.icon.deactivate_icon()
+
+    def handle_player_input(self, pointer, event):
+        if event.key == K_UP:
+            pointer.move_up()
+        elif event.key == K_DOWN:
+            pointer.move_down()
+        elif event.key == K_RIGHT:
+            pointer.move_right()
+        elif event.key == K_LEFT:
+            pointer.move_left()
+        elif event.key == K_SPACE:
+            pass  # trigger

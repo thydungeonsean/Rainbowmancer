@@ -19,12 +19,14 @@ class AbilityInventory(object):
     def add_ability(self, new_id):
         pass
 
-    def activate_ability(self, ability_id):
-        pass
+    def select_ability(self, ability):
+        self.player.map.game.set_active_ability(ability)
 
-    def select_button(self, slot):
+    def select_button(self, selection, slot):
+        self.select_ability(selection)
         other_abilities = filter(lambda a: a.panel_slot != slot, self.ability_list)
         map(lambda a: a.deactivate(), other_abilities)
 
     def deselect_button(self, slot):
+        self.player.map.game.clear_active_ability()
         map(lambda a: a.activate(), self.ability_list)

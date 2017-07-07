@@ -4,6 +4,8 @@ from src.map.mapgen.level_gen import LevelGen
 from turn_tracker import TurnTracker
 from effect_tracker import EffectTracker
 from src.state.ui.ui import UI
+from game_display import GameDisplay
+from pointer import Pointer
 
 
 class Game(object):
@@ -31,9 +33,14 @@ class Game(object):
         self.clock = pygame.time.Clock()
         self.tick = 0
 
+        self.pointer = Pointer(self)
+        self.cursor = None
+
         self.sub_screen = pygame.Surface((720, 720)).convert()
 
+        self.game_display = GameDisplay(self)
         self.screen_mode = 'zoomed'
+
         self.zoomed_sub_screen = pygame.Surface((19 * 16, 15 * 24)).convert()
         self.zoomed_sub_screen_scale = pygame.Surface((19 * 16 * 2, 15 * 24 * 2)).convert()
         self.zoomed_sub_screen_scale_rect = self.zoomed_sub_screen_scale.get_rect()
@@ -101,12 +108,7 @@ class Game(object):
         return sx * -16, sy * -24
 
     def switch_screen_mode(self):
-        if self.screen_mode == 'full':
-            self.screen_mode = 'zoomed'
-            self.sub_screen.fill((0, 0, 0))
-            self.draw_full()
-        elif self.screen_mode == 'zoomed':
-            self.screen_mode = 'full'
+        self.game_display.switch_screen_mode()
 
     def handle_input(self):
 
@@ -127,7 +129,9 @@ class Game(object):
 
                 if self.turn == 'player' and self.effect_tracker.effects_clear():
                     if self.active_ability is not None:
-                        pass
+
+                        self.active_ability.handle_player_input(self.pointer, event)
+
                     else:
                         self.handle_player_input(event)
 
@@ -187,3 +191,9 @@ class Game(object):
             self.clock.tick(Game.FPS)
             self.increment_tick()
             # print self.clock.get_fps()
+
+    def set_active_ability(self, ability):
+        self.active_ability = ability
+
+    def clear_active_ability(self):
+        self.active_ability = None
