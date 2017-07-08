@@ -4,6 +4,8 @@ from pygame.locals import *
 
 class Ability(object):
 
+    valid_keys = (K_UP, K_DOWN, K_RIGHT, K_LEFT, K_SPACE)
+
     def __init__(self, ability_id, inventory):
 
         self.active = False
@@ -48,6 +50,7 @@ class Ability(object):
         self.icon.deactivate_icon()
 
     def handle_player_input(self, pointer, event):
+        pointer.switch_keys_mode()
         if event.key == K_UP:
             pointer.move_up()
         elif event.key == K_DOWN:

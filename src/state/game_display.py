@@ -1,3 +1,4 @@
+import pygame
 
 
 class GameDisplay(object):
@@ -21,12 +22,20 @@ class GameDisplay(object):
 
     def in_bounds(self, (x, y)):
 
+        map_min_x, map_min_y, map_max_x, map_max_y = self.get_full_screen_bounds()
         if self.screen_mode == 'full':
-            min_x, min_y, max_x, max_y = self.get_full_screen_bounds()
+            min_x = map_min_x
+            min_y = map_min_y
+            max_x = map_max_x
+            max_y = map_max_y
         else:  # zoomed
-            min_x, min_y, max_x, max_y = self.get_zoomed_screen_bounds()
+            zoom_min_x, zoom_min_y, zoom_max_x, zoom_max_y = self.get_zoomed_screen_bounds()
+            min_x = max((map_min_x, zoom_min_x))
+            min_y = max((map_min_y, zoom_min_y))
+            max_x = min((map_max_x, zoom_max_x))
+            max_y = min((map_max_y, zoom_max_y))
 
-        return min_x <= x < max_x and min_y <= y < max_x
+        return min_x <= x < max_x and min_y <= y < max_y
 
     def get_full_screen_bounds(self):
 
@@ -62,4 +71,29 @@ class GameDisplay(object):
 
     def get_mouse_coord(self):
 
-        return None
+        x, y = pygame.mouse.get_pos()
+
+        if self.screen_mode == 'full':
+            return self.get_full_mouse_coord((x, y))
+        else:
+            return self.get_zoomed_mouse_coord((x, y))
+
+    def get_full_mouse_coord(self, (mx, my)):
+
+        x = mx / 16
+        y = my / 24
+
+        if self.in_bounds((x, y)):
+            return x, y
+        else:
+            return None
+
+    def get_zoomed_mouse_coord(self, (mx, my)):
+        sx, sy = self.get_screen_coord()
+        x = (mx-56) / (16 * 2) + sx
+        y = my / (24 * 2) + sy
+
+        if self.in_bounds((x, y)):
+            return x, y
+        else:
+            return None

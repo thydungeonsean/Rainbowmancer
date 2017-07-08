@@ -1,11 +1,14 @@
 import pygame
 from pygame.locals import *
+
 from src.map.mapgen.level_gen import LevelGen
+
 from turn_tracker import TurnTracker
 from effect_tracker import EffectTracker
 from src.state.ui.ui import UI
 from game_display import GameDisplay
 from pointer import Pointer
+from highlighter import Highlighter
 
 
 class Game(object):
@@ -34,7 +37,7 @@ class Game(object):
         self.tick = 0
 
         self.pointer = Pointer(self)
-        self.cursor = None
+        self.highlighter = Highlighter(self)
 
         self.sub_screen = pygame.Surface((720, 720)).convert()
 
@@ -73,9 +76,11 @@ class Game(object):
         for effect in self.effect_tracker.effects:
             effect.draw(self.sub_screen, self.tick)
 
-        if self.screen_mode == 'full':
+        self.highlighter.draw(self.sub_screen)
+
+        if self.game_display.screen_mode == 'full':
             self.draw_full()
-        elif self.screen_mode == 'zoomed':
+        elif self.game_display.screen_mode == 'zoomed':
             self.draw_zoomed()
 
         self.ui.draw(pygame.display.get_surface(), self.tick)
@@ -128,7 +133,7 @@ class Game(object):
                     self.switch_screen_mode()
 
                 if self.turn == 'player' and self.effect_tracker.effects_clear():
-                    if self.active_ability is not None:
+                    if self.active_ability is not None and event.key in self.active_ability.valid_keys:
 
                         self.active_ability.handle_player_input(self.pointer, event)
 
@@ -144,6 +149,10 @@ class Game(object):
                 elif event.button == 3:  # right click
                     if not self.ui.right_click(pygame.mouse.get_pos()):
                         pass  # handle right clicking the screen
+
+            elif event.type == MOUSEMOTION:
+
+                self.pointer.mouse_moved()
 
         return False
 

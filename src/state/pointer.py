@@ -18,15 +18,23 @@ class Pointer(object):
         self.mode = 0
         self.clear_coord()
 
-    def switch_keys_mode(self):
+    def switch_keys_mode(self, start=None):
         self.mode = 1
         # set start coord here
+        if self.coord is None:
+            if start is None:
+                self.set_coord(self.game.player.coord)
+            else:
+                self.set_coord(start)
+
+    def mouse_moved(self):
+        self.switch_mouse_mode()
+        self.set_coord((self.game.game_display.get_mouse_coord()))
 
     def clear_coord(self):
         self.coord = None
 
     def set_coord(self, coord):
-        print coord
         self.coord = coord
 
     def move_up(self):
