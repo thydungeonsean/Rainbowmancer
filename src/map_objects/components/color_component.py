@@ -25,14 +25,19 @@ class ColorComponent(object):
         self.flashes = []
 
     @property
-    def current_object_hue(self):
+    def current_object_hue_code(self):
         if self.mode == 'generate':
             return self.base_color
         elif self.mode == 'reflect':
             return self.get_current_tile_hue()
 
     def hue_interaction(self, target):
-        return hue_interaction(self.current_object_hue, target.owner.color_component.current_object_hue)
+        return hue_interaction(self.current_object_hue_code, target.owner.color_component.current_object_hue_code)
+
+    def generate_hue(self, new):
+        self.mode = 'generate'
+        self.base_color = new
+        assert new in range(7)  # just to make sure I'm using the hue code int here
 
     @staticmethod
     def set_color_mode(color):

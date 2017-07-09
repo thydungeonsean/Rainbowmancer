@@ -148,6 +148,8 @@ class Game(object):
 
                 elif event.button == 3:  # right click
                     if not self.ui.right_click(pygame.mouse.get_pos()):
+                        if self.active_ability is not None:
+                            self.player.ability_inventory.cancel_ability()
                         pass  # handle right clicking the screen
 
             elif event.type == MOUSEMOTION:
@@ -169,11 +171,15 @@ class Game(object):
             self.end_player_turn()
             pass  # player.pass
 
+    def start_player_turn(self):
+        self.turn = 'player'
+        self.player.ability_inventory.update()
+
     def end_player_turn(self):
         self.turn = 'monster'
 
     def end_monster_turn(self):
-        self.turn = 'player'
+        self.start_player_turn()
 
     def run(self):
 

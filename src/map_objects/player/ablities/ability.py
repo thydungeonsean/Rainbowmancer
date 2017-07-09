@@ -8,16 +8,24 @@ class Ability(object):
 
     def __init__(self, ability_id, inventory):
 
-        self.active = False
-
-        self.icon = AbilityIcon(self, ability_id, (0, 0), color='red')
-
+        self.icon = AbilityIcon(self, ability_id, (0, 0), color='white')
         self.inventory = inventory
-
         self.panel = None
         self.panel_slot = None
 
+        self.active = False
         self.state = 0
+
+        self.hue = 0  # hue code of player - determines ability effect and what kind of boosts available
+
+        self.must_boost = False  # some abilities need crystal boost to trigger
+        self.boosted = False  # toggle of whether crystal boost applied
+        self.cost = 1  # cost of crystal boost
+
+        self.target = None
+
+        # need functions for determining valid targets
+
 
     def initialize(self, panel, slot, coord):
 
@@ -35,12 +43,15 @@ class Ability(object):
         if self.state == 0:
             self.inventory.select_button(self, self.panel_slot)
             self.state = 1
+            self.icon.boost_icon()
         elif self.state == 1:
-            self.inventory.deselect_button(self.panel_slot)
+            self.inventory.deselect_button()
             self.state = 0
             self.reset_ability()
 
     def reset_ability(self):
+        self.state = 0
+        self.icon.unboost_icon()
         pass  # clear target and boost crystals etc.
 
     def activate(self):
@@ -61,3 +72,7 @@ class Ability(object):
             pointer.move_left()
         elif event.key == K_SPACE:
             pass  # trigger
+
+    def set_hue(self, hue_code):
+        self.icon.color_component.generate_hue(hue_code)
+        self.hue = hue_code

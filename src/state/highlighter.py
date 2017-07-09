@@ -7,7 +7,18 @@ class Highlighter(object):
 
         self.game = game
 
+        self.active = False
+        self.ability = None
+
+    def activate(self):
         self.active = True
+
+    def deactivate(self):
+        self.active = False
+
+    def set_active_ability(self, ability):
+        self.ability = ability
+        self.activate()
 
     def draw(self, surface):
 
@@ -18,5 +29,9 @@ class Highlighter(object):
             return
 
         x, y = self.game.pointer.coord
+        color = self.get_point_color((x, y))
+        pygame.draw.rect(surface, color, ((x*16, y*24), (16, 24)), 1)
 
-        pygame.draw.rect(surface, (255, 255, 255), ((x*16, y*24), (16, 24)), 1)
+    def get_pointer_color(self, (x, y)):
+
+        return 255, 255, 255

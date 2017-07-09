@@ -24,6 +24,7 @@ class TurnTracker(object):
 
         self.game.end_monster_turn()
 
+
     def dist_to_player(self, obj):
 
         mx, my = obj.coord

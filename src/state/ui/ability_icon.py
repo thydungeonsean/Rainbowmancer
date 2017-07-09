@@ -17,7 +17,6 @@ class AbilityIcon(Icon):
 
         self.glow = False
         self.tick = 0
-        self.count = 0
 
     def click(self, point):
 
@@ -30,14 +29,10 @@ class AbilityIcon(Icon):
 
         if self.glow:
 
-            color = self.color_component.get_boosted_color(self.base_color, self.tick)
-
-            self.count += 1
-            if self.count >= 5:
-                self.count = 0
-                self.tick += 1
-                if self.tick > 59:
-                    self.tick = 0
+            color = self.color_component.get_boosted_color(self.color_component.ready_shade(), self.tick)
+            self.tick += 1
+            if self.tick > 59:
+                self.tick = 0
 
         elif self.ready:
             color = self.color_component.ready_shade()
@@ -54,3 +49,9 @@ class AbilityIcon(Icon):
 
     def deactivate_icon(self):
         self.ready = False
+
+    def boost_icon(self):
+        self.glow = True
+
+    def unboost_icon(self):
+        self.glow = False

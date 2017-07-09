@@ -11,6 +11,8 @@ class AbilityInventory(object):
 
         self.initialize_abilities(abilities[:])
 
+        self.hue_code = 0
+
     def initialize_abilities(self, ability_ids):
 
         for ability_id in ability_ids:
@@ -27,6 +29,17 @@ class AbilityInventory(object):
         other_abilities = filter(lambda a: a.panel_slot != slot, self.ability_list)
         map(lambda a: a.deactivate(), other_abilities)
 
-    def deselect_button(self, slot):
+    def deselect_button(self):
         self.player.map.game.clear_active_ability()
         map(lambda a: a.activate(), self.ability_list)
+
+    def cancel_ability(self):
+        self.deselect_button()
+        map(lambda a: a.reset_ability(), self.ability_list)
+
+    def update(self):  # called at start of each player turn - updates color if necessary
+
+        if self.hue_code != self.player.color_component.current_object_hue_code:
+            self.hue_code = self.player.color_component.current_object_hue_code
+            map(lambda a: a.set_hue(self.hue_code), self.ability_list)
+
