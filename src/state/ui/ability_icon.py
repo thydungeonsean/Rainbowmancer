@@ -15,13 +15,12 @@ class AbilityIcon(Icon):
 
         Icon.__init__(self, coord, w, h, image, color)
 
-        self.glow = False
         self.tick = 0
 
     def click(self, point):
 
         if self.point_is_over(point) and self.ready:
-            self.ability.click()
+            self.ability.click_icon()
             return True
         return False
 

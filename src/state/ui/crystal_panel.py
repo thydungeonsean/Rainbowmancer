@@ -6,6 +6,8 @@ from crystal_icon import CrystalIcon
 
 class CrystalPanel(Panel):
 
+    colors = ('red', 'yellow', 'green', 'cyan', 'blue', 'purple')
+
     w = 240
     h = 240
 
@@ -32,12 +34,13 @@ class CrystalPanel(Panel):
         self.crystal_inventory = None
         Panel.__init__(self, ui, pix_w, pix_h, coord=coord)
 
-        self.crystals = {}
+        self.crystal_icons = {}
 
         self.inventory = None
 
     def load_player(self):
         self.inventory = self.ui.game.player.crystal_inventory
+        self.ui.game.player.crystal_inventory.set_panel(self)
         self.needs_update = True
 
         self.initialize()
@@ -45,7 +48,7 @@ class CrystalPanel(Panel):
     def initialize(self):
 
         cls = CrystalPanel
-        colors = ('red', 'yellow', 'green', 'cyan', 'blue', 'purple')
+        colors = cls.colors
 
         x = 0
 
@@ -53,8 +56,8 @@ class CrystalPanel(Panel):
 
             # create crystal icon
             pos = (self.x + self.get_icon_x(x), self.y + cls.icon_y)
-            crystal = CrystalIcon(pos, color)
-            self.crystals[color] = crystal
+            crystal = CrystalIcon(self, pos, color)
+            self.crystal_icons[color] = crystal
             self.add_element(crystal)
 
             x += 1
@@ -71,10 +74,12 @@ class CrystalPanel(Panel):
         self.border.draw(self.surface)
         self.draw_bars()
 
+        self.update_icons()
+
     def draw_bars(self):
 
         cls = CrystalPanel
-        colors = ('red', 'yellow', 'green', 'cyan', 'blue', 'purple')
+        colors = cls.colors
 
         x = 0
 
@@ -103,3 +108,13 @@ class CrystalPanel(Panel):
             self.surface.blit(bar, br)
 
             x += 1
+
+    def update_icons(self):
+
+        for color in CrystalPanel.colors:
+
+            if self.inventory.crystal_icon_active[color]:
+                self.crystal_icons[color].activate()
+            else:
+                self.crystal_icons[color].deactivate()
+

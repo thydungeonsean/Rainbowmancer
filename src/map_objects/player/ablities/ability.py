@@ -1,5 +1,6 @@
 from src.state.ui.ability_icon import AbilityIcon
 from pygame.locals import *
+from boost_slot import BoostSlot
 
 
 class Ability(object):
@@ -18,14 +19,15 @@ class Ability(object):
 
         self.hue = 0  # hue code of player - determines ability effect and what kind of boosts available
 
-        self.must_boost = False  # some abilities need crystal boost to trigger
-        self.boosted = False  # toggle of whether crystal boost applied
+        self.needs_boost = True  # some abilities need crystal boost to trigger
         self.cost = 1  # cost of crystal boost
 
+        self.boost_slot = BoostSlot(self)
+
+        self.valid_targets = set()
         self.target = None
 
         # need functions for determining valid targets
-
 
     def initialize(self, panel, slot, coord):
 
@@ -39,7 +41,7 @@ class Ability(object):
     def set_panel_slot(self, slot):
         self.panel_slot = slot
 
-    def click(self):
+    def click_icon(self):
         if self.state == 0:
             self.inventory.select_button(self, self.panel_slot)
             self.state = 1
@@ -52,7 +54,8 @@ class Ability(object):
     def reset_ability(self):
         self.state = 0
         self.icon.unboost_icon()
-        pass  # clear target and boost crystals etc.
+        self.boost_slot.clear_color()
+        self.clear_target()
 
     def activate(self):
         self.icon.activate_icon()
@@ -71,8 +74,42 @@ class Ability(object):
         elif event.key == K_LEFT:
             pointer.move_left()
         elif event.key == K_SPACE:
-            pass  # trigger
+            self.click_map(pointer.coord)
 
     def set_hue(self, hue_code):
         self.icon.color_component.generate_hue(hue_code)
         self.hue = hue_code
+
+    def clicked_crystal(self, color):
+
+        self.boost_slot.crystal_click(color)
+
+    def cast(self):
+
+        if self.needs_boost and self.boost_slot.boost_color is None:
+            print 'needs boost'
+            return False  # needs a boost - feedback?
+
+        if self.target is None:
+            print 'no target'
+            return False  # needs a target
+
+        self.trigger_ability()
+
+    def click_map(self, pos):
+        print pos
+        self.set_target(pos)
+        self.cast()
+
+    def set_target(self, target):
+
+        # if target is valid
+
+        self.target = target
+
+    def clear_target(self):
+        self.target = None
+
+    def trigger_ability(self):
+
+        print 'ability fired'

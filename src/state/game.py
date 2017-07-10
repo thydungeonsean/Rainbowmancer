@@ -144,7 +144,9 @@ class Game(object):
 
                 if event.button == 1:  # left click
                     if not self.ui.click(pygame.mouse.get_pos()):  # no icon clicked
-                        pass  # handle clicking the screen
+                        if self.active_ability is not None:
+                            coord = self.pointer.coord
+                            self.active_ability.click_map(coord)
 
                 elif event.button == 3:  # right click
                     if not self.ui.right_click(pygame.mouse.get_pos()):

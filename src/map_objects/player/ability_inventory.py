@@ -23,15 +23,19 @@ class AbilityInventory(object):
 
     def select_ability(self, ability):
         self.player.map.game.set_active_ability(ability)
+        self.player.crystal_inventory.activate_crystals(ability)
 
     def select_button(self, selection, slot):
         self.select_ability(selection)
         other_abilities = filter(lambda a: a.panel_slot != slot, self.ability_list)
         map(lambda a: a.deactivate(), other_abilities)
+        self.player.map.game.highlighter.activate()
 
     def deselect_button(self):
         self.player.map.game.clear_active_ability()
         map(lambda a: a.activate(), self.ability_list)
+        self.player.crystal_inventory.deactivate_crystals()
+        self.player.map.game.highlighter.deactivate()
 
     def cancel_ability(self):
         self.deselect_button()

@@ -17,7 +17,7 @@ class Icon(object):
             self.image.recolor(self.base_color)
             self.position(coord)
 
-        self.glow = True
+        self.glow = False
 
     def draw(self, surface, tick):
         self.image.draw(surface)
@@ -40,7 +40,6 @@ class Icon(object):
 
     def right_click(self, (x, y)):
         if self.point_is_over((x, y)):
-            print 'right clicked icon ' + str(self)
             return True
         else:
             return False

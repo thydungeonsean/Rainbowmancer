@@ -100,6 +100,17 @@ hue_weaknesses = {
 }
 
 
+hue_ability_affinities = {
+    0: {1, 2, 3, 4, 5, 6},
+    1: {1, 4, 5},
+    2: {2, 4, 6},
+    3: {3, 5, 6},
+    4: {1, 2, 4},
+    5: {1, 3, 5},
+    6: {2, 3, 6}
+}
+
+
 def col_mod_shade(shade, col_mod):
 
     mod_shade = shade + col_mod
