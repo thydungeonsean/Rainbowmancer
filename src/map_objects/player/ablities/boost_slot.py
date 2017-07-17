@@ -1,3 +1,4 @@
+from src.color.color_palette import hue_codes
 
 
 class BoostSlot(object):
@@ -22,10 +23,12 @@ class BoostSlot(object):
 
         self.boost_color = color
         self.state = 1
+        self.ability.set_hue(hue_codes[color])
 
     def clear_color(self):
         self.boost_color = None
         self.state = 0
+        self.ability.set_hue_to_inventory_hue()
 
     def switch_color(self, color):
 

@@ -1,4 +1,4 @@
-from src.map_objects.bolt import Bolt
+from src.map_objects.bolt_effect import Bolt
 from src.map_objects.explosion import Explosion
 
 

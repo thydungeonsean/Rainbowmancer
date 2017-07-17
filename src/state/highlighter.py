@@ -34,4 +34,9 @@ class Highlighter(object):
 
     def get_pointer_color(self, (x, y)):
 
+        if self.game.active_ability is not None:
+            ability = self.game.active_ability
+            if (x, y) in ability.valid_targets:
+                return 40, 255, 20
+
         return 255, 255, 255

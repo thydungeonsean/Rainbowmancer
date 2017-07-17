@@ -43,11 +43,11 @@ class Ability(object):
 
     def click_icon(self):
         if self.state == 0:
-            self.inventory.select_button(self, self.panel_slot)
+            self.inventory.select_ability(self, self.panel_slot)
             self.state = 1
             self.icon.boost_icon()
         elif self.state == 1:
-            self.inventory.deselect_button()
+            self.inventory.deselect_ability()
             self.state = 0
             self.reset_ability()
 
@@ -80,6 +80,10 @@ class Ability(object):
         self.icon.color_component.generate_hue(hue_code)
         self.hue = hue_code
 
+    def set_hue_to_inventory_hue(self):
+        hue = self.inventory.hue_code
+        self.set_hue(hue)
+
     def clicked_crystal(self, color):
 
         self.boost_slot.crystal_click(color)
@@ -104,8 +108,11 @@ class Ability(object):
     def set_target(self, target):
 
         # if target is valid
+        if target in self.valid_targets:
 
-        self.target = target
+            self.target = target
+        else:
+            self.clear_target()
 
     def clear_target(self):
         self.target = None
@@ -113,3 +120,27 @@ class Ability(object):
     def trigger_ability(self):
 
         print 'ability fired'
+
+    def compute_valid_targets(self):
+        all_coords = self.inventory.player.map.terrain_map.all_points
+        valid_targets = set(filter(self.is_valid_target, all_coords))
+
+        self.valid_targets = valid_targets
+
+    def is_valid_target(self, coord):  # tune this function for different targeting schemes
+
+        level = self.inventory.player.map
+
+        # if needs fov, filter by in fov
+        if not level.fov_map.point_is_visible(coord):
+            return False
+
+        # if only target enemies - restrict to enemy coords
+
+
+        # if only target certain terrain types filter terrain map
+        valid_terrain = (0, 3, 5, 6, 8)
+
+
+
+        return True
