@@ -7,10 +7,6 @@ class Invoke(Ability):
 
         Ability.__init__(self, 'invoke', inventory)
 
-    def is_valid_target(self, coord):
-
-        pass
-
     def trigger_ability(self):
 
         print 'invoke'

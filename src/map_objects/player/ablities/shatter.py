@@ -6,10 +6,8 @@ class Shatter(Ability):
     def __init__(self, inventory):
 
         Ability.__init__(self, 'shatter', inventory)
-
-    def is_valid_target(self, coord):
-
-        pass
+        self.restrict_terrain = True
+        self.target_terrain = {1, 3, 4, 5, 8}
 
     def trigger_ability(self):
 

@@ -3,7 +3,7 @@ from ablities.ability_collection import *
 
 class AbilityInventory(object):
 
-    def __init__(self, player, abilities=('bolt', 'bind', 'ray')):
+    def __init__(self, player, abilities=('bolt', 'bind', 'ray', 'summon', 'invoke', 'imbue', 'shatter', 'block')):
 
         self.player = player
 

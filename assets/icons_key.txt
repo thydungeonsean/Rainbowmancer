@@ -35,5 +35,5 @@
 [shatter: 0: 2]
 [block: 1: 2]
 [invoke: 2: 2]
-[imbue: 3: 3]
+[imbue: 3: 2]
 ]

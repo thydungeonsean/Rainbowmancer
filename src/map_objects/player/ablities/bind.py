@@ -6,10 +6,8 @@ class Bind(Ability):
     def __init__(self, inventory):
 
         Ability.__init__(self, 'bind', inventory)
-
-    def is_valid_target(self, coord):
-
-        pass
+        self.restrict_terrain = True
+        self.target_terrain = {8}
 
     def trigger_ability(self):
 

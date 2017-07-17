@@ -27,7 +27,12 @@ class Ability(object):
         self.valid_targets = set()
         self.target = None
 
-        # need functions for determining valid targets
+        # targeting toggles
+        self.in_fov = True
+        self.not_self = False
+        self.not_enemy = False
+        self.restrict_terrain = False
+        self.target_terrain = set()
 
     def initialize(self, panel, slot, coord):
 
@@ -132,15 +137,25 @@ class Ability(object):
         level = self.inventory.player.map
 
         # if needs fov, filter by in fov
-        if not level.fov_map.point_is_visible(coord):
+        if self.in_fov:
+            if not level.fov_map.point_is_visible(coord):
+                return False
+
+        # if can't target self, filter
+        if coord == self.inventory.player.coord and self.not_self:
             return False
 
-        # if only target enemies - restrict to enemy coords
-
-
         # if only target certain terrain types filter terrain map
-        valid_terrain = (0, 3, 5, 6, 8)
+        if self.restrict_terrain:
+            terrain = level.terrain_map.get_tile(coord)
+            if terrain not in self.target_terrain:
+                return False
 
+        # if only target enemies - restrict to enemy coords
+        if self.not_enemy:
+            pass  # check if coord is an enemy coord
 
+        return True
 
+    def speical_ability_is_valid_target(self, coord):
         return True
